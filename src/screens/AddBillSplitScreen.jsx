@@ -7,7 +7,7 @@ import Button from '../components/Button';
 import BottomSheet from '../components/BottomSheet';
 import { TAB_TYPES, tabTypeFor } from '../data/tabTypes';
 
-const COMMON_TAB_NAMES = ['Trip', 'Roommates', 'Party', 'Weekend Getaway', 'Office Group', 'Dinner Club'];
+const COMMON_TAB_NAMES = ['Trip', 'Roommates', 'Party', 'Weekend Getaway', 'Office Group'];
 
 export default function AddBillSplitScreen({
   tabs, currentUser, knownPeople, billName, amount, presetTabId, onNavigate, onNext,
@@ -42,9 +42,9 @@ export default function AddBillSplitScreen({
     setOtherParticipants((prev) => prev.filter((p) => p !== name));
   }
 
-  const suggestions = knownPeople.filter(
-    (p) => p !== currentUser && !otherParticipants.some((op) => op.toLowerCase() === p.toLowerCase())
-  );
+  const suggestions = knownPeople
+    .filter((p) => p !== currentUser && !otherParticipants.some((op) => op.toLowerCase() === p.toLowerCase()))
+    .slice(0, 5);
 
   const isNewTab = destTabId === '__new__';
   const newTabReady = newTabName.trim().length > 0;

@@ -5,7 +5,7 @@ import Input from '../components/Input';
 import AmountInput from '../components/AmountInput';
 import Button from '../components/Button';
 
-const COMMON_BILL_NAMES = ['Dinner', 'Lunch', 'Groceries', 'Cab', 'Drinks', 'Movie', 'Rent', 'Hotel', 'Shopping'];
+const COMMON_BILL_NAMES = ['Dinner', 'Groceries', 'Cab', 'Rent', 'Drinks'];
 
 export default function AddBillScreen({ onNavigate, presetTabId, initialBillName = '', initialAmount = '' }) {
   const [scanning, setScanning] = useState(false);

@@ -8,6 +8,8 @@ import Button from '../components/Button';
 import BottomSheet from '../components/BottomSheet';
 import { settlementsForTab, displayName } from '../data/appState';
 
+const MAX_SUGGESTIONS = 5;
+
 export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavigate, onMarkPaid, onAddParticipant }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [nameInput, setNameInput] = useState('');
@@ -15,15 +17,20 @@ export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavig
   if (!tab) return null;
   const settlements = settlementsForTab(tab);
 
-  const suggestions = knownPeople.filter(
-    (p) => !tab.participants.some((existing) => existing.toLowerCase() === p.toLowerCase())
-  );
+  const suggestions = knownPeople
+    .filter((p) => !tab.participants.some((existing) => existing.toLowerCase() === p.toLowerCase()))
+    .slice(0, MAX_SUGGESTIONS);
 
   function addPerson(rawName) {
     const name = rawName.trim();
     if (!name) return;
     onAddParticipant(tab.id, name);
     setNameInput('');
+  }
+
+  function handleAddBill() {
+    setSheetOpen(false);
+    onNavigate('addBill', { tabId: tab.id });
   }
 
   return (
@@ -41,7 +48,7 @@ export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavig
               <div
                 className="flex items-center justify-center rounded-full"
                 style={{ width: 32, height: 32, background: '#EEF2FF', border: '2px solid #F8FAFC' }}
-                aria-label="Manage tab members"
+                aria-label="Manage this tab"
               >
                 <Plus size={16} color="#4F46E5" />
               </div>
@@ -88,26 +95,25 @@ export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavig
             </div>
           ))}
         </div>
+      </div>
 
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Manage Tab">
         {!tab.settled && (
-          <Button
-            variant="secondary"
-            className="w-full mt-5"
-            onClick={() => onNavigate('addBill', { tabId: tab.id })}
-          >
+          <Button variant="primary" className="w-full" onClick={handleAddBill}>
             + Add Bill to this Tab
           </Button>
         )}
-      </div>
 
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Tab Members">
-        <div className="flex flex-col gap-2">
-          {tab.participants.map((p) => (
-            <div key={p} className="flex items-center gap-3 px-3 py-2 rounded-[10px]" style={{ background: '#F4F5F7' }}>
-              <Avatar name={p} size={32} />
-              <span className="text-sm font-semibold text-[#111827]">{displayName(p, currentUser)}</span>
-            </div>
-          ))}
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Members</span>
+          <div className="flex flex-col gap-2">
+            {tab.participants.map((p) => (
+              <div key={p} className="flex items-center gap-3 px-3 py-2 rounded-[10px]" style={{ background: '#F4F5F7' }}>
+                <Avatar name={p} size={32} />
+                <span className="text-sm font-semibold text-[#111827]">{displayName(p, currentUser)}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {!tab.settled && (
@@ -115,7 +121,6 @@ export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavig
             <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Add Someone New</span>
             <div className="flex gap-2">
               <input
-                autoFocus
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addPerson(nameInput); } }}
