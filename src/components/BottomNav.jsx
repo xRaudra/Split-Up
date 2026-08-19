@@ -72,7 +72,7 @@ export default function BottomNav({ active, onNavigate }) {
 
       {/* Add Bill — floats in the notch */}
       <button
-        onClick={() => onNavigate('addBill')}
+        onClick={() => onNavigate('addBillTab')}
         aria-label="Add Bill"
         className="flex items-center justify-center rounded-full transition-all active:scale-95"
         style={{

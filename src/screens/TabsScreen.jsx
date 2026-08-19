@@ -15,7 +15,7 @@ export default function TabsScreen({ tabs, onNavigate }) {
             title="No tabs yet"
             body="Create your first tab to start splitting bills with friends."
             ctaLabel="Create Tab"
-            onCta={() => onNavigate('addBill')}
+            onCta={() => onNavigate('addBillTab')}
           />
         )}
 

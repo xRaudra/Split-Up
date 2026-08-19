@@ -24,7 +24,7 @@ export default function AddBillMethodScreen({
   const canSubmit = method === 'equally' || remainder === 0;
 
   function handleBack() {
-    onNavigate('addBill', { tabId: presetTabId, restore: restoreState });
+    onNavigate('addBill', { tabId: presetTabId, destTabId, newTabName, tabType, restore: restoreState });
   }
 
   function handleSubmit() {

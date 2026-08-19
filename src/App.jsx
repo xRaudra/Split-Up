@@ -7,6 +7,7 @@ import OnboardingNameScreen from './screens/OnboardingNameScreen';
 import HomeScreen from './screens/HomeScreen';
 import TabsScreen from './screens/TabsScreen';
 import TabDetailScreen from './screens/TabDetailScreen';
+import AddToTabScreen from './screens/AddToTabScreen';
 import AddBillScreen from './screens/AddBillScreen';
 import AddBillMethodScreen from './screens/AddBillMethodScreen';
 import HistoryScreen from './screens/HistoryScreen';
@@ -143,6 +144,8 @@ export default function App() {
             onAddParticipant={handleAddParticipant}
           />
         );
+      case 'addBillTab':
+        return <AddToTabScreen tabs={tabs} onNavigate={navigate} restore={screenData?.restore} />;
       case 'addBill':
         return (
           <AddBillScreen
@@ -150,6 +153,9 @@ export default function App() {
             currentUser={currentUser}
             knownPeople={knownPeople}
             presetTabId={screenData?.tabId}
+            destTabId={screenData?.destTabId}
+            newTabName={screenData?.newTabName}
+            tabType={screenData?.tabType}
             restore={screenData?.restore}
             onNavigate={navigate}
           />

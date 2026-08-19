@@ -5,65 +5,45 @@ import Input from '../components/Input';
 import AmountInput from '../components/AmountInput';
 import Avatar from '../components/Avatar';
 import Button from '../components/Button';
-import BottomSheet from '../components/BottomSheet';
 import ErrorMessage from '../components/ErrorMessage';
-import { TAB_TYPES, tabTypeFor } from '../data/tabTypes';
+import { tabTypeFor } from '../data/tabTypes';
 import { displayName } from '../data/appState';
 
 const COMMON_BILL_NAMES = ['Dinner', 'Groceries', 'Cab', 'Rent', 'Drinks'];
-const COMMON_TAB_NAMES = ['Trip', 'Roommates', 'Party', 'Weekend Getaway', 'Office Group'];
 
-export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTabId, onNavigate, restore = {} }) {
-  const activeTabs = tabs.filter((t) => !t.settled);
-  const startDestTabId = restore.destTabId || presetTabId || (activeTabs[0]?.id ?? '__new__');
-  const startTab = tabs.find((t) => t.id === startDestTabId);
+export default function AddBillScreen({
+  tabs, currentUser, knownPeople, presetTabId,
+  destTabId: incomingDestTabId, newTabName: incomingNewTabName, tabType: incomingTabType,
+  restore = {}, onNavigate,
+}) {
+  const resolvedDestTabId = presetTabId || incomingDestTabId || '__new__';
+  const resolvedNewTabName = incomingNewTabName || '';
+  const resolvedTabType = incomingTabType ?? null;
+  const isNewTab = resolvedDestTabId === '__new__';
+  const tab = tabs.find((t) => t.id === resolvedDestTabId);
+  const selectedType = tabTypeFor(resolvedTabType);
 
   const [scanning, setScanning] = useState(false);
   const [billName, setBillName] = useState(restore.billName ?? '');
   const [amount, setAmount] = useState(restore.amount ?? '');
   const [contactsUnavailable, setContactsUnavailable] = useState(false);
 
-  const [destTabId, setDestTabId] = useState(startDestTabId);
-  const [newTabName, setNewTabName] = useState(restore.newTabName ?? '');
-  const [tabType, setTabType] = useState(restore.tabType ?? null);
-  const [tabSheetOpen, setTabSheetOpen] = useState(false);
-
-  const [selected, setSelected] = useState(
-    () => new Set(restore.selected ?? [currentUser, ...(startTab ? startTab.participants : [])])
+  const existingMembers = useMemo(
+    () => (isNewTab ? [currentUser] : [...new Set([currentUser, ...(tab ? tab.participants : [])])]),
+    [isNewTab, tab, currentUser]
   );
+
+  const [selected, setSelected] = useState(() => new Set(restore.selected ?? existingMembers));
   const [newlyAdded, setNewlyAdded] = useState(() => restore.newlyAdded ?? []);
   const [paidBy, setPaidBy] = useState(restore.paidBy ?? currentUser);
   const [participantInput, setParticipantInput] = useState('');
 
   const amountNum = Number(amount) || 0;
-  const isNewTab = destTabId === '__new__';
-  const newTabReady = newTabName.trim().length > 0;
-  const selectedType = tabTypeFor(tabType);
-
-  const existingMembers = useMemo(() => {
-    if (isNewTab) return [currentUser];
-    const tab = tabs.find((t) => t.id === destTabId);
-    return [...new Set([currentUser, ...(tab ? tab.participants : [])])];
-  }, [isNewTab, destTabId, tabs, currentUser]);
 
   const finalParticipants = useMemo(
     () => [...existingMembers.filter((p) => selected.has(p)), ...newlyAdded],
     [existingMembers, selected, newlyAdded]
   );
-
-  function switchTab(id) {
-    setDestTabId(id);
-    const tab = tabs.find((t) => t.id === id);
-    setSelected(new Set([currentUser, ...(tab ? tab.participants : [])]));
-    setNewlyAdded([]);
-  }
-
-  function confirmNewTab() {
-    setDestTabId('__new__');
-    setSelected(new Set([currentUser]));
-    setNewlyAdded([]);
-    setTabSheetOpen(false);
-  }
 
   function toggleSelected(name) {
     setSelected((prev) => {
@@ -113,27 +93,32 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
     )
     .slice(0, 5);
 
-  const canContinue = billName.trim() && amountNum > 0 && finalParticipants.length > 0 && (isNewTab ? newTabReady : true);
+  const canContinue = billName.trim() && amountNum > 0 && finalParticipants.length > 0;
+
+  function handleBack() {
+    if (presetTabId) {
+      onNavigate('tabDetail', { tabId: presetTabId });
+    } else {
+      onNavigate('addBillTab', { restore: { destTabId: resolvedDestTabId, newTabName: resolvedNewTabName, tabType: resolvedTabType } });
+    }
+  }
 
   function handleContinue() {
     onNavigate('addBillMethod', {
       tabId: presetTabId,
       billName: billName.trim(),
       amount,
-      destTabId: isNewTab ? null : destTabId,
-      newTabName: isNewTab ? newTabName.trim() : null,
-      tabType: isNewTab ? tabType : null,
+      destTabId: isNewTab ? null : resolvedDestTabId,
+      newTabName: isNewTab ? resolvedNewTabName : null,
+      tabType: isNewTab ? resolvedTabType : null,
       participants: finalParticipants,
       newPeople: newlyAdded,
       // Payer doesn't have to be sharing the bill themselves (e.g. paid for
       // others only) - just has to be someone actually on this bill's list.
       paidBy: [...existingMembers, ...newlyAdded].includes(paidBy) ? paidBy : currentUser,
-      restoreState: {
+      restore: {
         billName: billName.trim(),
         amount,
-        destTabId,
-        newTabName,
-        tabType,
         selected: [...selected],
         newlyAdded,
         paidBy,
@@ -158,8 +143,15 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
-      <TopBar title="Add Bill" onBack={() => onNavigate(presetTabId ? 'tabDetail' : 'home', { tabId: presetTabId })} />
+      <TopBar title="Add Bill" onBack={handleBack} />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pt-4 pb-8 flex flex-col gap-5 screen-enter">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-[10px]" style={{ background: '#EEF2FF' }}>
+          {selectedType && <selectedType.Icon size={15} color="#4F46E5" />}
+          <span className="text-sm" style={{ color: '#4F46E5' }}>
+            Adding to <span className="font-semibold">{isNewTab ? resolvedNewTabName : tab?.name}</span>
+          </span>
+        </div>
+
         <div className="flex flex-col gap-2">
           <Input label="Bill Name" placeholder="e.g. Dinner at Beach Shack" value={billName} onChange={(e) => setBillName(e.target.value)} />
           <div className="flex flex-wrap gap-2">
@@ -177,38 +169,6 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
         </div>
 
         <AmountInput label="Amount" value={amount} onChange={setAmount} onScanClick={() => setScanning(true)} />
-
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Add to</span>
-          <div className="flex gap-2 flex-wrap">
-            {activeTabs.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => switchTab(t.id)}
-                className="px-3.5 py-2 rounded-full text-sm font-semibold"
-                style={{
-                  background: destTabId === t.id ? '#4F46E5' : '#FFFFFF',
-                  color: destTabId === t.id ? '#FFFFFF' : '#111827',
-                  border: `1.5px solid ${destTabId === t.id ? '#4F46E5' : '#E5E7EB'}`,
-                }}
-              >
-                {t.name}
-              </button>
-            ))}
-            <button
-              onClick={() => setTabSheetOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold"
-              style={{
-                background: isNewTab ? '#EEF2FF' : '#FFFFFF',
-                color: isNewTab ? '#4F46E5' : '#111827',
-                border: `1.5px solid ${isNewTab ? '#4F46E5' : '#E5E7EB'}`,
-              }}
-            >
-              {isNewTab && selectedType && <selectedType.Icon size={14} />}
-              {isNewTab && newTabReady ? newTabName : '+ New Tab'}
-            </button>
-          </div>
-        </div>
 
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Split Between</span>
@@ -337,52 +297,6 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
           Split It Fairly
         </Button>
       </div>
-
-      <BottomSheet open={tabSheetOpen} onClose={() => setTabSheetOpen(false)} title="Name Your Tab">
-        <Input placeholder="e.g. Goa Trip" value={newTabName} onChange={(e) => setNewTabName(e.target.value)} />
-
-        <div className="flex flex-wrap gap-2">
-          {COMMON_TAB_NAMES.map((name) => (
-            <button
-              key={name}
-              onClick={() => setNewTabName(name)}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold"
-              style={{ background: newTabName === name ? '#EEF2FF' : '#F4F5F7', color: newTabName === name ? '#4F46E5' : '#6B7280' }}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Tab Type (optional)</span>
-          <div className="flex flex-wrap gap-2">
-            {TAB_TYPES.map(({ key, label, Icon }) => {
-              const isSelected = tabType === key;
-              return (
-                <button
-                  key={key}
-                  onClick={() => setTabType(isSelected ? null : key)}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold"
-                  style={{
-                    background: isSelected ? '#EEF2FF' : '#FFFFFF',
-                    color: isSelected ? '#4F46E5' : '#111827',
-                    border: `1.5px solid ${isSelected ? '#4F46E5' : '#E5E7EB'}`,
-                  }}
-                >
-                  <Icon size={15} />
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <Button variant="primary" className="w-full" disabled={!newTabReady} onClick={confirmNewTab}>
-          <Check size={16} />
-          Use This Tab
-        </Button>
-      </BottomSheet>
     </div>
   );
 }
