@@ -1,3 +1,7 @@
+import maleAvatar from '../assets/avatar-male.png';
+import femaleAvatar from '../assets/avatar-female.png';
+import { detectGender } from '../data/genderNames';
+
 const TINTS = [
   { bg: '#EEF2FF', fg: '#4338CA' },
   { bg: '#FEF3C7', fg: '#92400E' },
@@ -11,21 +15,21 @@ function tintFor(seed) {
 }
 
 export default function Avatar({ name, size = 36, selected = false }) {
-  const initials = name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
-  const tint = tintFor(name);
+  const gender = detectGender(name);
+  const illustration = gender === 'male' ? maleAvatar : gender === 'female' ? femaleAvatar : null;
+
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <div
-        className="flex items-center justify-center rounded-full font-semibold"
-        style={{
-          width: size, height: size,
-          background: tint.bg, color: tint.fg,
-          fontSize: Math.round(size * 0.36),
-          border: selected ? '2px solid #4F46E5' : 'none',
-        }}
-      >
-        {initials}
-      </div>
+      {illustration ? (
+        <img
+          src={illustration}
+          alt=""
+          className="rounded-full object-cover"
+          style={{ width: size, height: size, border: selected ? '2px solid #4F46E5' : 'none' }}
+        />
+      ) : (
+        <InitialsCircle name={name} size={size} selected={selected} />
+      )}
       {selected && (
         <div
           className="absolute flex items-center justify-center rounded-full"
@@ -39,6 +43,24 @@ export default function Avatar({ name, size = 36, selected = false }) {
           </svg>
         </div>
       )}
+    </div>
+  );
+}
+
+function InitialsCircle({ name, size, selected }) {
+  const initials = name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
+  const tint = tintFor(name);
+  return (
+    <div
+      className="flex items-center justify-center rounded-full font-semibold"
+      style={{
+        width: size, height: size,
+        background: tint.bg, color: tint.fg,
+        fontSize: Math.round(size * 0.36),
+        border: selected ? '2px solid #4F46E5' : 'none',
+      }}
+    >
+      {initials}
     </div>
   );
 }

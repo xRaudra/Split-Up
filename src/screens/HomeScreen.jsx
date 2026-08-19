@@ -37,10 +37,12 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
             </button>
           ) : (
             <EmptyState
-              title="No tabs yet"
-              body="A tab groups the bills for a trip, dinner, or shared house — create one to start splitting with friends."
-              ctaLabel="Create Your First Tab"
-              onCta={() => onNavigate('addBill')}
+              title="Ready to split your first bill"
+              body={
+                <>
+                  Tap <span style={{ color: '#4F46E5', fontWeight: 700 }}>+</span> below to create your first tab and start splitting with friends.
+                </>
+              }
             />
           )
         ) : (
