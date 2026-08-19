@@ -10,7 +10,7 @@ const rightTabs = [
 ];
 
 const PAGE_BG = '#F8FAFC';
-const BUTTON_SIZE = 72;
+const BUTTON_SIZE = 68;
 const NOTCH_SIZE = BUTTON_SIZE + 4;
 
 function NavIcon({ tab, active, onNavigate }) {
@@ -86,7 +86,7 @@ export default function BottomNav({ active, onNavigate }) {
           boxShadow: '0 6px 18px rgba(79,70,229,0.45)',
         }}
       >
-        <PlusCircle size={32} strokeWidth={2} color="#FFFFFF" />
+        <PlusCircle size={30} strokeWidth={2} color="#FFFFFF" />
       </button>
     </div>
   );
