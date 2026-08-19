@@ -1,25 +1,30 @@
 import { useMemo, useState } from 'react';
+import { X } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import Input from '../components/Input';
 import AmountInput from '../components/AmountInput';
-import ParticipantRow from '../components/ParticipantRow';
+import Avatar from '../components/Avatar';
 import SplitMethodSelector from '../components/SplitMethodSelector';
 import ErrorMessage from '../components/ErrorMessage';
 import Button from '../components/Button';
-import { currentUser, people } from '../data/mockData';
 
-export default function AddBillManualScreen({ tabs, presetTabId, onNavigate, onSubmit }) {
+export default function AddBillManualScreen({ tabs, currentUser, knownPeople, presetTabId, onNavigate, onSubmit }) {
   const activeTabs = tabs.filter((t) => !t.settled);
+  const initialDestTabId = presetTabId || (activeTabs[0]?.id ?? '__new__');
+  const initialDestTab = tabs.find((t) => t.id === initialDestTabId);
   const [billName, setBillName] = useState('');
   const [amount, setAmount] = useState('');
-  const [destTabId, setDestTabId] = useState(presetTabId || (activeTabs[0]?.id ?? '__new__'));
+  const [destTabId, setDestTabId] = useState(initialDestTabId);
   const [newTabName, setNewTabName] = useState('');
-  const [selected, setSelected] = useState(() => new Set([currentUser]));
+  const [otherParticipants, setOtherParticipants] = useState(
+    () => (initialDestTab ? initialDestTab.participants.filter((p) => p !== currentUser) : [])
+  );
+  const [participantInput, setParticipantInput] = useState('');
   const [method, setMethod] = useState('equally');
   const [customShares, setCustomShares] = useState({});
 
+  const selectedList = useMemo(() => [currentUser, ...otherParticipants], [currentUser, otherParticipants]);
   const amountNum = Number(amount) || 0;
-  const selectedList = people.filter((p) => selected.has(p));
   const perHead = selectedList.length ? Math.round(amountNum / selectedList.length) : 0;
 
   const customTotal = useMemo(
@@ -28,20 +33,29 @@ export default function AddBillManualScreen({ tabs, presetTabId, onNavigate, onS
   );
   const remainder = amountNum - customTotal;
 
-  function toggle(person) {
-    if (person === currentUser) return; // payer always included
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(person)) next.delete(person); else next.add(person);
-      return next;
-    });
+  function addParticipant(rawName) {
+    const name = rawName.trim();
+    if (!name) return;
+    const exists =
+      name.toLowerCase() === currentUser.toLowerCase() ||
+      otherParticipants.some((p) => p.toLowerCase() === name.toLowerCase());
+    if (!exists) setOtherParticipants((prev) => [...prev, name]);
+    setParticipantInput('');
   }
+
+  function removeParticipant(name) {
+    setOtherParticipants((prev) => prev.filter((p) => p !== name));
+  }
+
+  const suggestions = knownPeople.filter(
+    (p) => p !== currentUser && !otherParticipants.some((op) => op.toLowerCase() === p.toLowerCase())
+  );
 
   const isNewTab = destTabId === '__new__';
   const canSubmit =
     billName.trim() &&
     amountNum > 0 &&
-    selectedList.length > 0 &&
+    otherParticipants.length > 0 &&
     (isNewTab ? newTabName.trim() : true) &&
     (method === 'equally' || remainder === 0);
 
@@ -64,6 +78,7 @@ export default function AddBillManualScreen({ tabs, presetTabId, onNavigate, onS
       destTabId: isNewTab ? null : destTabId,
       newTabName: isNewTab ? newTabName.trim() : null,
       participants: selectedList,
+      newPeople: otherParticipants,
       bill,
     });
   }
@@ -109,13 +124,62 @@ export default function AddBillManualScreen({ tabs, presetTabId, onNavigate, onS
           )}
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Split Between</span>
-          <div className="flex flex-col gap-2">
-            {people.map((p) => (
-              <ParticipantRow key={p} name={p} selected={selected.has(p)} onToggle={() => toggle(p)} />
+
+          <div className="flex flex-wrap gap-2">
+            <div className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full" style={{ background: '#EEF2FF', border: '1.5px solid #4F46E5' }}>
+              <Avatar name={currentUser} size={24} />
+              <span className="text-sm font-semibold" style={{ color: '#4F46E5' }}>You</span>
+            </div>
+            {otherParticipants.map((p) => (
+              <div key={p} className="flex items-center gap-1.5 pl-1.5 pr-2 py-1.5 rounded-full bg-white" style={{ border: '1.5px solid #E5E7EB' }}>
+                <Avatar name={p} size={24} />
+                <span className="text-sm font-semibold text-[#111827]">{p}</span>
+                <button onClick={() => removeParticipant(p)} aria-label={`Remove ${p}`} className="flex items-center justify-center rounded-full" style={{ width: 18, height: 18, color: '#9CA3AF' }}>
+                  <X size={13} />
+                </button>
+              </div>
             ))}
           </div>
+
+          <div className="flex gap-2">
+            <input
+              value={participantInput}
+              onChange={(e) => setParticipantInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addParticipant(participantInput); } }}
+              placeholder="Add a person by name"
+              className="flex-1 h-11 px-4 rounded-[10px] text-sm font-medium outline-none placeholder:text-[#9CA3AF] placeholder:font-normal"
+              style={{ background: '#FFFFFF', border: '1.5px solid #E5E7EB', color: '#111827' }}
+            />
+            <button
+              onClick={() => addParticipant(participantInput)}
+              disabled={!participantInput.trim()}
+              className="h-11 px-4 rounded-[10px] text-sm font-semibold disabled:opacity-40"
+              style={{ background: '#EEF2FF', color: '#4F46E5' }}
+            >
+              Add
+            </button>
+          </div>
+
+          {suggestions.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => addParticipant(p)}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                  style={{ background: '#F4F5F7', color: '#6B7280' }}
+                >
+                  + {p}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {otherParticipants.length === 0 && (
+            <span className="text-xs" style={{ color: '#9CA3AF' }}>Add at least one person to split this with.</span>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -127,7 +191,7 @@ export default function AddBillManualScreen({ tabs, presetTabId, onNavigate, onS
           <div className="flex flex-col gap-2">
             {selectedList.map((p) => (
               <div key={p} className="flex items-center gap-3">
-                <span className="flex-1 text-sm font-semibold text-[#111827]">{p}</span>
+                <span className="flex-1 text-sm font-semibold text-[#111827]">{p === currentUser ? 'You' : p}</span>
                 <div className="flex items-center gap-1 h-10 px-3 rounded-[10px]" style={{ background: '#FFFFFF', border: '1.5px solid #E5E7EB' }}>
                   <span className="text-sm text-[#6B7280]">₹</span>
                   <input

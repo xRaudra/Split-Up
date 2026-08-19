@@ -25,7 +25,7 @@ export default function WelcomeScreen({ onNavigate }) {
 
       <div className="flex flex-col items-center gap-6 mt-16 w-full">
         <button
-          onClick={() => onNavigate('home')}
+          onClick={() => onNavigate('setupName')}
           className="w-full max-w-[281px] h-[50px] rounded-[10px] font-medium text-[18px] text-white"
           style={{
             background: '#4F46E5',

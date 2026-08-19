@@ -3,11 +3,11 @@ import Avatar from '../components/Avatar';
 import StatusBadge from '../components/StatusBadge';
 import SettlementRow from '../components/SettlementRow';
 import Button from '../components/Button';
-import { settlementsForTab } from '../data/mockData';
+import { settlementsForTab, displayName } from '../data/appState';
 
-export default function TabDetailScreen({ tab, onNavigate, onMarkPaid }) {
+export default function TabDetailScreen({ tab, currentUser, onNavigate, onMarkPaid }) {
   if (!tab) return null;
-  const settlements = settlementsForTab(tab);
+  const settlements = settlementsForTab(tab, currentUser);
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
@@ -29,21 +29,26 @@ export default function TabDetailScreen({ tab, onNavigate, onMarkPaid }) {
           <span className="font-bold text-[28px] text-[#111827]">₹{tab.total.toLocaleString('en-IN')}</span>
         </div>
 
-        <span className="block font-semibold text-[13px] text-[#6B7280] uppercase tracking-wide mb-2">
-          {tab.settled ? 'Settlement' : 'Who owes what'}
-        </span>
-        <div className="flex flex-col gap-2 mb-6">
-          {settlements.map((s) => (
-            <SettlementRow
-              key={s.from}
-              from={s.from}
-              to={s.to}
-              amount={s.amount}
-              status={s.status}
-              onMarkPaid={!tab.settled ? () => onMarkPaid(tab.id, s.from) : undefined}
-            />
-          ))}
-        </div>
+        {settlements.length > 0 && (
+          <>
+            <span className="block font-semibold text-[13px] text-[#6B7280] uppercase tracking-wide mb-2">
+              {tab.settled ? 'Settlement' : 'Who owes what'}
+            </span>
+            <div className="flex flex-col gap-2 mb-6">
+              {settlements.map((s) => (
+                <SettlementRow
+                  key={s.from}
+                  from={s.from}
+                  to={s.to}
+                  currentUser={currentUser}
+                  amount={s.amount}
+                  status={s.status}
+                  onMarkPaid={!tab.settled ? () => onMarkPaid(tab.id, s.from) : undefined}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
         <span className="block font-semibold text-[13px] text-[#6B7280] uppercase tracking-wide mb-2">Bills</span>
         <div className="flex flex-col gap-2">
@@ -51,7 +56,7 @@ export default function TabDetailScreen({ tab, onNavigate, onMarkPaid }) {
             <div key={b.id} className="flex items-center justify-between px-4 py-3 rounded-[10px] bg-white" style={{ border: '1px solid #E5E7EB' }}>
               <div className="flex flex-col">
                 <span className="font-semibold text-sm text-[#111827]">{b.name}</span>
-                <span className="text-xs text-[#6B7280]">Paid by {b.paidBy.split(' ')[0]} · {b.method === 'items' ? 'By items' : b.method === 'equally' ? 'Equally' : 'Custom'}</span>
+                <span className="text-xs text-[#6B7280]">Paid by {displayName(b.paidBy, currentUser)} · {b.method === 'items' ? 'By items' : b.method === 'equally' ? 'Equally' : 'Custom'}</span>
               </div>
               <span className="font-semibold text-sm text-[#111827]">₹{b.total.toLocaleString('en-IN')}</span>
             </div>

@@ -3,6 +3,7 @@ import './index.css';
 import PhoneFrame from './components/PhoneFrame';
 import BottomNav from './components/BottomNav';
 import WelcomeScreen from './screens/WelcomeScreen';
+import OnboardingNameScreen from './screens/OnboardingNameScreen';
 import HomeScreen from './screens/HomeScreen';
 import TabsScreen from './screens/TabsScreen';
 import TabDetailScreen from './screens/TabDetailScreen';
@@ -10,18 +11,50 @@ import AddBillScreen from './screens/AddBillScreen';
 import AddBillManualScreen from './screens/AddBillManualScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
-import { currentUser, initialTabs } from './data/mockData';
 
 const navScreens = ['home', 'tabs', 'history', 'profile'];
 
 export default function App() {
-  const [tabs, setTabs] = useState(initialTabs);
+  const [tabs, setTabs] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [knownPeople, setKnownPeople] = useState([]);
   const [screen, setScreen] = useState('welcome');
   const [screenData, setScreenData] = useState(null);
 
   function navigate(target, data = null) {
     setScreenData(data);
     setScreen(target);
+  }
+
+  function handleSetName(name) {
+    setCurrentUser(name);
+    setKnownPeople([name]);
+    navigate('home');
+  }
+
+  // Renaming mid-session has to cascade through every tab, or old bills would
+  // silently reference a name that no longer matches "You".
+  function handleRename(newName) {
+    const oldName = currentUser;
+    if (newName === oldName) return;
+    setTabs((prev) =>
+      prev.map((t) => ({
+        ...t,
+        participants: t.participants.map((p) => (p === oldName ? newName : p)),
+        paidParticipants: (t.paidParticipants || []).map((p) => (p === oldName ? newName : p)),
+        bills: t.bills.map((b) => ({
+          ...b,
+          paidBy: b.paidBy === oldName ? newName : b.paidBy,
+          shares: Object.fromEntries(Object.entries(b.shares).map(([p, v]) => [p === oldName ? newName : p, v])),
+        })),
+      }))
+    );
+    setKnownPeople((prev) => prev.map((p) => (p === oldName ? newName : p)));
+    setCurrentUser(newName);
+  }
+
+  function handleResetData() {
+    setTabs([]);
   }
 
   function markPaid(tabId, person) {
@@ -35,7 +68,9 @@ export default function App() {
     );
   }
 
-  function handleAddBillSubmit({ destTabId, newTabName, participants, bill }) {
+  function handleAddBillSubmit({ destTabId, newTabName, participants, newPeople, bill }) {
+    setKnownPeople((prev) => [...new Set([...prev, ...newPeople])]);
+    const targetTabId = destTabId || `tab-${Date.now()}`;
     setTabs((prev) => {
       if (destTabId) {
         return prev.map((t) =>
@@ -53,7 +88,7 @@ export default function App() {
         );
       }
       const newTab = {
-        id: `tab-${Date.now()}`,
+        id: targetTabId,
         name: newTabName,
         participants,
         bills: [bill],
@@ -64,9 +99,7 @@ export default function App() {
       };
       return [newTab, ...prev];
     });
-    // A brand-new tab's generated id isn't known here, so land on the Tabs
-    // list in that case; otherwise go straight into the tab that was updated.
-    navigate(destTabId ? 'tabDetail' : 'tabs', destTabId ? { tabId: destTabId } : null);
+    navigate('tabDetail', { tabId: targetTabId });
   }
 
   const activeTab = tabs.find((t) => t.id === screenData?.tabId);
@@ -75,29 +108,33 @@ export default function App() {
     switch (screen) {
       case 'welcome':
         return <WelcomeScreen onNavigate={navigate} />;
+      case 'setupName':
+        return <OnboardingNameScreen onSubmit={handleSetName} />;
       case 'home':
-        return <HomeScreen tabs={tabs} onNavigate={navigate} />;
+        return <HomeScreen tabs={tabs} currentUser={currentUser} onNavigate={navigate} />;
       case 'tabs':
         return <TabsScreen tabs={tabs} onNavigate={navigate} />;
       case 'tabDetail':
-        return <TabDetailScreen tab={activeTab} onNavigate={navigate} onMarkPaid={markPaid} />;
+        return <TabDetailScreen tab={activeTab} currentUser={currentUser} onNavigate={navigate} onMarkPaid={markPaid} />;
       case 'addBill':
         return <AddBillScreen onNavigate={navigate} presetTabId={screenData?.tabId} />;
       case 'addBillManual':
         return (
           <AddBillManualScreen
             tabs={tabs}
+            currentUser={currentUser}
+            knownPeople={knownPeople}
             presetTabId={screenData?.tabId}
             onNavigate={navigate}
             onSubmit={handleAddBillSubmit}
           />
         );
       case 'history':
-        return <HistoryScreen tabs={tabs} onNavigate={navigate} />;
+        return <HistoryScreen tabs={tabs} currentUser={currentUser} onNavigate={navigate} />;
       case 'profile':
-        return <ProfileScreen />;
+        return <ProfileScreen currentUser={currentUser} onRename={handleRename} onResetData={handleResetData} />;
       default:
-        return <HomeScreen tabs={tabs} onNavigate={navigate} />;
+        return <HomeScreen tabs={tabs} currentUser={currentUser} onNavigate={navigate} />;
     }
   }
 
