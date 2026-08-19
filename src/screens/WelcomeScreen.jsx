@@ -3,7 +3,7 @@ import Logo from '../components/Logo';
 
 const footerLinks = [
   { label: 'Github Link', href: 'https://github.com/xRaudra/Split-Up' },
-  { label: 'Figma Link', href: 'https://www.figma.com/design/sTePYFCx0qGteISHh6ppqs/VMock-Split-Up-App' },
+  { label: 'Figma Link', href: 'https://figmashort.link/WnDbwz' },
   { label: 'Notes', href: '#' },
 ];
 
