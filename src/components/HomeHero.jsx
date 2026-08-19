@@ -25,7 +25,7 @@ export default function HomeHero({ currentUser, amount, badge }) {
         <span className="text-white font-semibold text-center" style={{ fontSize: 51 }}>{amount}</span>
         <div
           className="flex items-center rounded-full"
-          style={{ background: '#6B6EEA', padding: '16px 24px', borderRadius: 35 }}
+          style={{ background: '#6B6EEA', padding: '8px 16px', borderRadius: 35 }}
         >
           <span className="text-white" style={{ fontSize: 12 }}>{badge}</span>
         </div>
