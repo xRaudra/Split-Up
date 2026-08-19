@@ -11,13 +11,16 @@ Core design principle: **Simple by default. Flexible when needed.**
 - Styling: Tailwind CSS v4 (via `@tailwindcss/vite`, tokens defined in `src/index.css` under `@theme`)
 - Icons: lucide-react
 - Deploy: Vercel (auto-deploys from GitHub `xRaudra/Split-Up`, `main`/`master` branch)
-- No backend — all data lives in `src/data/mockData.js`; navigation is in-memory React state (no router)
+- No backend, no storage — all state is React state in `App.jsx` (`tabs`, `currentUser`, `knownPeople`). Closing the tab clears everything by design. `src/data/appState.js` holds only pure helpers (`settlementsForTab`, `totalOwedToUser`, `displayName`) — no seeded/mock data lives in the repo.
+- Navigation is in-memory (`navigate(screen, data)` state switch in `App.jsx`, no react-router).
 
 ## Information Architecture
-Bottom nav (5 items): **Home | Tabs | Add Bill | History | Profile**
+Flow: **Welcome → "What should we call you?" (sets `currentUser`) → Home**, then bottom nav (5 items): **Home | Tabs | Add Bill | History | Profile**
 - A **Tab** (not "Split") groups multiple bills for a trip/event/shared account (e.g. "Goa Trip").
-- **Add Bill** is the primary action: Scan Bill (placeholder in this prototype) or Enter Manually → choose participants → choose split method → add to an existing Tab or create a new one.
+- **Add Bill** is the primary action: Scan Bill (placeholder in this prototype) or Enter Manually → type-to-add participants (chip input, remembers names via `knownPeople` for one-tap re-add) → choose split method → add to an existing Tab or create a new one.
 - Split methods: **Equally** or **Custom** (Custom supports flat per-person amounts or by-items, so a person who only had one item can be charged just for that item).
+- The current user always renders as **"You"** in participant-facing lists (via `displayName()`), but keeps their real name for Avatar initials — never swap the name passed to `Avatar`, only the label text.
+- Renaming yourself in Profile cascades through every existing tab/bill (`App.jsx`'s `handleRename`) so old data doesn't reference a stale name.
 
 ## Design Tokens (`src/index.css` `@theme`)
 - Primary `#4F46E5` / Primary Dark `#3730A3`
@@ -28,7 +31,7 @@ Bottom nav (5 items): **Home | Tabs | Add Bill | History | Profile**
 - Radius: sm 8 / md 10 / lg 12 / full 9999
 
 ## Component Conventions
-Shared components live in `src/components/` (Button, Input, AmountInput, Avatar, ParticipantRow, SplitMethodSelector, TabCard, SettlementRow, SummaryCard, StatusBadge, EmptyState, ErrorMessage, BottomNav, TopBar, PhoneFrame). Screens live in `src/screens/`, one file per screen, composed in `App.jsx` via a `navigate(screen, data)` state switch — no react-router.
+Shared components live in `src/components/` (Button, Input, AmountInput, Avatar, Logo, ParticipantRow, SplitMethodSelector, TabCard, SettlementRow, SummaryCard, StatusBadge, EmptyState, ErrorMessage, BottomNav, TopBar, PhoneFrame). `ParticipantRow` is a documented Design System component not currently consumed by any screen (Add Bill uses a chip-input instead) — that's fine, don't delete it as "unused." Screens live in `src/screens/`.
 
 Status/state must always be communicated with text or an icon, never color alone (accessibility).
 
