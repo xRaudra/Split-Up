@@ -9,8 +9,8 @@ const footerLinks = [
 
 export default function WelcomeScreen({ onNavigate }) {
   return (
-    <div className="flex flex-col h-full px-5 pt-[150px] pb-5 fade-in overflow-y-auto hide-scrollbar" style={{ background: '#F8FAFC' }}>
-      <div className="flex-1 flex flex-col items-center justify-center min-h-0">
+    <div className="flex flex-col h-full px-5 pt-[130px] pb-5 fade-in overflow-y-auto hide-scrollbar" style={{ background: '#F8FAFC' }}>
+      <div className="flex-1 flex flex-col items-center min-h-0">
         <Logo size={82} />
 
         <div className="flex flex-col items-center gap-3.5 mt-[45px]">
