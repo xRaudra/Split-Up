@@ -2,7 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 import Logo from '../components/Logo';
 
 const footerLinks = [
-  { label: 'Github Link', href: 'https://github.com/xRaudra/Split-Up' },
+  { label: 'Github Link', href: 'https://github.com/xRaudra/Split-Up.git' },
   { label: 'Figma Link', href: 'https://figmashort.link/WnDbwz' },
   { label: 'Notes', href: '#' },
 ];
