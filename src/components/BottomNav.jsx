@@ -17,7 +17,7 @@ export default function BottomNav({ active, onNavigate }) {
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderTop: '1px solid #E5E7EB',
-        height: 49,
+        height: 56,
         flexShrink: 0,
       }}
     >
