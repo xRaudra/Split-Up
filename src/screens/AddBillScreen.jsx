@@ -1,10 +1,21 @@
 import { useState } from 'react';
-import { Camera, Keyboard } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import TopBar from '../components/TopBar';
+import Input from '../components/Input';
+import AmountInput from '../components/AmountInput';
 import Button from '../components/Button';
 
-export default function AddBillScreen({ onNavigate, presetTabId }) {
+export default function AddBillScreen({ onNavigate, presetTabId, initialBillName = '', initialAmount = '' }) {
   const [scanning, setScanning] = useState(false);
+  const [billName, setBillName] = useState(initialBillName);
+  const [amount, setAmount] = useState(initialAmount);
+
+  const amountNum = Number(amount) || 0;
+  const canContinue = billName.trim() && amountNum > 0;
+
+  function handleContinue() {
+    onNavigate('addBillSplit', { tabId: presetTabId, billName: billName.trim(), amount });
+  }
 
   if (scanning) {
     return (
@@ -13,11 +24,10 @@ export default function AddBillScreen({ onNavigate, presetTabId }) {
           <Camera size={28} color="#FFFFFF" />
         </div>
         <span className="font-semibold text-white text-[16px]">Scanning isn't wired up in this prototype</span>
-        <span className="text-sm" style={{ color: '#9CA3AF' }}>In the real app, this camera view reads the bill total automatically. For now, continue manually.</span>
-        <Button variant="primary" className="w-full mt-2" onClick={() => onNavigate('addBillManual', { tabId: presetTabId })}>
+        <span className="text-sm" style={{ color: '#9CA3AF' }}>In the real app, this camera view reads the bill name and total automatically. For now, continue by typing them in.</span>
+        <Button variant="primary" className="w-full mt-2" onClick={() => setScanning(false)}>
           Continue Manually
         </Button>
-        <button onClick={() => setScanning(false)} className="text-sm font-semibold" style={{ color: '#9CA3AF' }}>Back</button>
       </div>
     );
   }
@@ -25,36 +35,15 @@ export default function AddBillScreen({ onNavigate, presetTabId }) {
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
       <TopBar title="Add Bill" onBack={() => onNavigate(presetTabId ? 'tabDetail' : 'home', { tabId: presetTabId })} />
-      <div className="flex-1 px-5 pt-4 flex flex-col gap-4 screen-enter">
-        <span className="text-sm text-[#6B7280] mb-1">How do you want to add this bill?</span>
+      <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pt-4 pb-8 flex flex-col gap-5 screen-enter">
+        <Input label="Bill Name" placeholder="e.g. Dinner at Beach Shack" value={billName} onChange={(e) => setBillName(e.target.value)} />
+        <AmountInput label="Amount" value={amount} onChange={setAmount} onScanClick={() => setScanning(true)} />
 
-        <button
-          onClick={() => setScanning(true)}
-          className="flex items-start gap-4 px-5 py-5 rounded-xl text-left bg-white"
-          style={{ border: '1.5px solid #E5E7EB' }}
-        >
-          <div className="flex items-center justify-center rounded-full shrink-0" style={{ width: 44, height: 44, background: '#EEF2FF' }}>
-            <Camera size={22} color="#4F46E5" />
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="font-semibold text-[16px] text-[#111827]">Scan Bill</span>
-            <span className="text-[13px] text-[#6B7280]">Snap a photo and we'll read the total</span>
-          </div>
-        </button>
+        <div className="flex-1" />
 
-        <button
-          onClick={() => onNavigate('addBillManual', { tabId: presetTabId })}
-          className="flex items-start gap-4 px-5 py-5 rounded-xl text-left bg-white"
-          style={{ border: '1.5px solid #E5E7EB' }}
-        >
-          <div className="flex items-center justify-center rounded-full shrink-0" style={{ width: 44, height: 44, background: '#EEF2FF' }}>
-            <Keyboard size={22} color="#4F46E5" />
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="font-semibold text-[16px] text-[#111827]">Enter Manually</span>
-            <span className="text-[13px] text-[#6B7280]">Type in the amount and split it yourself</span>
-          </div>
-        </button>
+        <Button variant="primary" className="w-full" disabled={!canContinue} onClick={handleContinue}>
+          Who's Splitting?
+        </Button>
       </div>
     </div>
   );

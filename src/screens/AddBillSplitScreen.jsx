@@ -2,18 +2,15 @@ import { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import Input from '../components/Input';
-import AmountInput from '../components/AmountInput';
 import Avatar from '../components/Avatar';
 import SplitMethodSelector from '../components/SplitMethodSelector';
 import ErrorMessage from '../components/ErrorMessage';
 import Button from '../components/Button';
 
-export default function AddBillManualScreen({ tabs, currentUser, knownPeople, presetTabId, onNavigate, onSubmit }) {
+export default function AddBillSplitScreen({ tabs, currentUser, knownPeople, billName, amount, presetTabId, onNavigate, onSubmit }) {
   const activeTabs = tabs.filter((t) => !t.settled);
   const initialDestTabId = presetTabId || (activeTabs[0]?.id ?? '__new__');
   const initialDestTab = tabs.find((t) => t.id === initialDestTabId);
-  const [billName, setBillName] = useState('');
-  const [amount, setAmount] = useState('');
   const [destTabId, setDestTabId] = useState(initialDestTabId);
   const [newTabName, setNewTabName] = useState('');
   const [otherParticipants, setOtherParticipants] = useState(
@@ -53,8 +50,6 @@ export default function AddBillManualScreen({ tabs, currentUser, knownPeople, pr
 
   const isNewTab = destTabId === '__new__';
   const canSubmit =
-    billName.trim() &&
-    amountNum > 0 &&
     otherParticipants.length > 0 &&
     (isNewTab ? newTabName.trim() : true) &&
     (method === 'equally' || remainder === 0);
@@ -67,7 +62,7 @@ export default function AddBillManualScreen({ tabs, currentUser, knownPeople, pr
 
     const bill = {
       id: `bill-${Date.now()}`,
-      name: billName.trim(),
+      name: billName,
       total: amountNum,
       paidBy: currentUser,
       method,
@@ -85,10 +80,15 @@ export default function AddBillManualScreen({ tabs, currentUser, knownPeople, pr
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
-      <TopBar title="Enter Bill" onBack={() => onNavigate('addBill', { tabId: presetTabId })} />
+      <TopBar
+        title="Split It"
+        onBack={() => onNavigate('addBill', { tabId: presetTabId, billName, amount })}
+      />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 flex flex-col gap-5 screen-enter">
-        <Input label="Bill Name" placeholder="e.g. Dinner at Beach Shack" value={billName} onChange={(e) => setBillName(e.target.value)} />
-        <AmountInput label="Amount" value={amount} onChange={setAmount} />
+        <div className="flex items-center justify-between px-4 py-3 rounded-[10px] bg-white" style={{ border: '1px solid #E5E7EB' }}>
+          <span className="font-semibold text-sm text-[#111827] truncate">{billName}</span>
+          <span className="font-semibold text-sm text-[#111827] shrink-0">₹{amountNum.toLocaleString('en-IN')}</span>
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Add to</span>

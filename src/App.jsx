@@ -8,7 +8,7 @@ import HomeScreen from './screens/HomeScreen';
 import TabsScreen from './screens/TabsScreen';
 import TabDetailScreen from './screens/TabDetailScreen';
 import AddBillScreen from './screens/AddBillScreen';
-import AddBillManualScreen from './screens/AddBillManualScreen';
+import AddBillSplitScreen from './screens/AddBillSplitScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
 
@@ -117,13 +117,22 @@ export default function App() {
       case 'tabDetail':
         return <TabDetailScreen tab={activeTab} currentUser={currentUser} onNavigate={navigate} onMarkPaid={markPaid} />;
       case 'addBill':
-        return <AddBillScreen onNavigate={navigate} presetTabId={screenData?.tabId} />;
-      case 'addBillManual':
         return (
-          <AddBillManualScreen
+          <AddBillScreen
+            onNavigate={navigate}
+            presetTabId={screenData?.tabId}
+            initialBillName={screenData?.billName}
+            initialAmount={screenData?.amount}
+          />
+        );
+      case 'addBillSplit':
+        return (
+          <AddBillSplitScreen
             tabs={tabs}
             currentUser={currentUser}
             knownPeople={knownPeople}
+            billName={screenData?.billName}
+            amount={screenData?.amount}
             presetTabId={screenData?.tabId}
             onNavigate={navigate}
             onSubmit={handleAddBillSubmit}
