@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './index.css';
 import PhoneFrame from './components/PhoneFrame';
 import BottomNav from './components/BottomNav';
+import WelcomeScreen from './screens/WelcomeScreen';
 import HomeScreen from './screens/HomeScreen';
 import TabsScreen from './screens/TabsScreen';
 import TabDetailScreen from './screens/TabDetailScreen';
@@ -15,7 +16,7 @@ const navScreens = ['home', 'tabs', 'history', 'profile'];
 
 export default function App() {
   const [tabs, setTabs] = useState(initialTabs);
-  const [screen, setScreen] = useState('home');
+  const [screen, setScreen] = useState('welcome');
   const [screenData, setScreenData] = useState(null);
 
   function navigate(target, data = null) {
@@ -72,6 +73,8 @@ export default function App() {
 
   function renderScreen() {
     switch (screen) {
+      case 'welcome':
+        return <WelcomeScreen onNavigate={navigate} />;
       case 'home':
         return <HomeScreen tabs={tabs} onNavigate={navigate} />;
       case 'tabs':
