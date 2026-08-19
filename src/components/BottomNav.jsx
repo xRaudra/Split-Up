@@ -10,7 +10,7 @@ const rightTabs = [
 ];
 
 const PAGE_BG = '#F8FAFC';
-const BUTTON_SIZE = 64;
+const BUTTON_SIZE = 72;
 const NOTCH_SIZE = BUTTON_SIZE + 4;
 
 function NavIcon({ tab, active, onNavigate }) {
@@ -71,27 +71,23 @@ export default function BottomNav({ active, onNavigate }) {
       />
 
       {/* Add Bill — floats in the notch */}
-      <div
-        className="flex flex-col items-center gap-1"
-        style={{ position: 'absolute', top: -(BUTTON_SIZE / 2), left: '50%', transform: 'translateX(-50%)' }}
+      <button
+        onClick={() => onNavigate('addBill')}
+        aria-label="Add Bill"
+        className="flex items-center justify-center rounded-full transition-all active:scale-95"
+        style={{
+          position: 'absolute',
+          top: -(BUTTON_SIZE / 2),
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: BUTTON_SIZE,
+          height: BUTTON_SIZE,
+          background: '#4F46E5',
+          boxShadow: '0 6px 18px rgba(79,70,229,0.45)',
+        }}
       >
-        <button
-          onClick={() => onNavigate('addBill')}
-          aria-label="Add Bill"
-          className="flex items-center justify-center rounded-full transition-all active:scale-95"
-          style={{
-            width: BUTTON_SIZE,
-            height: BUTTON_SIZE,
-            background: '#4F46E5',
-            boxShadow: '0 6px 18px rgba(79,70,229,0.45)',
-          }}
-        >
-          <PlusCircle size={28} strokeWidth={2} color="#FFFFFF" />
-        </button>
-        <span className="text-[11px] font-medium" style={{ color: '#4F46E5', lineHeight: '13px' }}>
-          Add Bill
-        </span>
-      </div>
+        <PlusCircle size={32} strokeWidth={2} color="#FFFFFF" />
+      </button>
     </div>
   );
 }

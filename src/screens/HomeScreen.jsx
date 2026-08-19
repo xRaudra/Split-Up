@@ -55,17 +55,7 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
         )}
       </div>
 
-      {hasAnyTabs && (
-        <div className="px-5 mt-5 mb-8">
-          <button
-            onClick={() => onNavigate('addBill')}
-            className="w-full h-12 rounded-[10px] font-semibold text-[15px] text-white"
-            style={{ background: '#4F46E5' }}
-          >
-            + Add Bill
-          </button>
-        </div>
-      )}
+      <div className="h-8 shrink-0" />
     </div>
   );
 }
