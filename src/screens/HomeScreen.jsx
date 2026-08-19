@@ -13,19 +13,20 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
     <div className="flex flex-col h-full overflow-y-auto hide-scrollbar screen-enter" style={{ background: '#F8FAFC' }}>
       <div className="px-5 pt-6 pb-2">
         <span className="text-sm text-[#6B7280]">Hey {firstName} 👋</span>
-        {!hasAnyTabs && (
-          <h1 className="text-[22px] font-bold text-[#111827] mt-0.5">Let's split your first bill</h1>
-        )}
       </div>
 
-      {hasAnyTabs && (
-        <div className="px-5 mt-5">
-          <SummaryCard
-            value={`₹${owed.toLocaleString('en-IN')}`}
-            badge={owed > 0 ? "You'll receive across all tabs" : "You're all settled up"}
-          />
-        </div>
-      )}
+      <div className="px-5 mt-5">
+        <SummaryCard
+          value={`₹${owed.toLocaleString('en-IN')}`}
+          badge={
+            !hasAnyTabs
+              ? 'Create your first tab to get started'
+              : owed > 0
+                ? "You'll receive across all tabs"
+                : "You're all settled up"
+          }
+        />
+      </div>
 
       {activeTabs.length > 0 && (
         <div className="flex items-center justify-between px-5 mt-5 mb-2">
