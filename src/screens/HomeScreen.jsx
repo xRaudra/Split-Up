@@ -23,7 +23,6 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
           <SummaryCard
             headline={owed > 0 ? `You're owed ₹${owed.toLocaleString('en-IN')}` : "You're all settled up"}
             sub={owed > 0 ? 'Across all active tabs' : 'Nothing pending right now'}
-            tone={owed > 0 ? 'neutral' : 'positive'}
           />
         </div>
       )}

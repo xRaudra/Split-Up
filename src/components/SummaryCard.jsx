@@ -1,14 +1,13 @@
-export default function SummaryCard({ headline, sub, tone = 'neutral' }) {
-  const tones = {
-    neutral: { bg: '#EEF2FF', fg: '#3730A3' },
-    positive: { bg: '#F0FDF4', fg: '#166534' },
-    negative: { bg: '#FEF2F2', fg: '#991B1B' },
-  };
-  const t = tones[tone];
+import summaryCardBg from '../assets/summary-card-bg.png';
+
+export default function SummaryCard({ headline, sub }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 rounded-2xl text-center" style={{ background: t.bg }}>
-      <span className="font-bold text-[26px] leading-tight" style={{ fontFamily: 'Poppins, sans-serif', color: t.fg }}>{headline}</span>
-      {sub && <span className="text-sm text-[#6B7280]">{sub}</span>}
+    <div
+      className="flex flex-col items-center justify-center gap-1 px-6 py-8 rounded-2xl text-center bg-cover bg-right"
+      style={{ backgroundImage: `url(${summaryCardBg})`, backgroundColor: '#4F46E5' }}
+    >
+      <span className="font-bold text-[26px] leading-tight text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>{headline}</span>
+      {sub && <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{sub}</span>}
     </div>
   );
 }
