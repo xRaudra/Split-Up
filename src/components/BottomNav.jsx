@@ -39,7 +39,7 @@ export default function BottomNav({ active, onNavigate }) {
         WebkitBackdropFilter: 'blur(20px)',
         borderTop: '1px solid #E5E7EB',
         height: 83,
-        paddingTop: 10,
+        paddingTop: 4,
         paddingBottom: 24,
         boxSizing: 'border-box',
       }}
