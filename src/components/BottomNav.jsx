@@ -24,26 +24,26 @@ export default function BottomNav({ active, onNavigate }) {
             <button
               key={key}
               onClick={() => onNavigate(key)}
-              className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all active:scale-95"
-              style={{ minWidth: 52 }}
+              className="flex flex-col items-center justify-center gap-0.5 px-2 rounded-xl transition-all active:scale-95"
+              style={{ minWidth: 52, height: 49 }}
             >
               {primary ? (
                 <div
-                  className="flex items-center justify-center rounded-full -mt-6 mb-0.5"
+                  className="flex items-center justify-center rounded-full -mt-4 mb-0.5"
                   style={{
-                    width: 44, height: 44,
+                    width: 40, height: 40,
                     background: '#4F46E5',
                     boxShadow: '0 4px 14px rgba(79,70,229,0.4)',
                   }}
                 >
-                  <Icon size={22} strokeWidth={2} color="#FFFFFF" />
+                  <Icon size={20} strokeWidth={2} color="#FFFFFF" />
                 </div>
               ) : (
-                <Icon size={22} strokeWidth={isActive ? 2.2 : 1.8} color={isActive ? '#4F46E5' : '#9CA3AF'} />
+                <Icon size={20} strokeWidth={isActive ? 2.2 : 1.8} color={isActive ? '#4F46E5' : '#9CA3AF'} />
               )}
               <span
                 className="text-[11px] font-medium"
-                style={{ color: isActive || primary ? '#4F46E5' : '#6B7280' }}
+                style={{ color: isActive || primary ? '#4F46E5' : '#6B7280', lineHeight: '13px' }}
               >
                 {label}
               </span>
