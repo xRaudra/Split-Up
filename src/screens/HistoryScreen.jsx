@@ -4,7 +4,7 @@ import StatusBadge from '../components/StatusBadge';
 import EmptyState from '../components/EmptyState';
 import { settlementsForTab } from '../data/appState';
 
-export default function HistoryScreen({ tabs, currentUser, onNavigate }) {
+export default function HistoryScreen({ tabs, onNavigate }) {
   const settledTabs = tabs.filter((t) => t.settled);
 
   return (
@@ -16,7 +16,7 @@ export default function HistoryScreen({ tabs, currentUser, onNavigate }) {
         ) : (
           <div className="flex flex-col gap-3">
             {settledTabs.map((tab) => {
-              const settlements = settlementsForTab(tab, currentUser);
+              const settlements = settlementsForTab(tab);
               return (
                 <button
                   key={tab.id}

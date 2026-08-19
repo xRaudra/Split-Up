@@ -12,6 +12,7 @@ import AddBillSplitScreen from './screens/AddBillSplitScreen';
 import AddBillMethodScreen from './screens/AddBillMethodScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import { settlementsForTab } from './data/appState';
 
 const navScreens = ['home', 'tabs', 'history', 'profile'];
 
@@ -42,7 +43,9 @@ export default function App() {
       prev.map((t) => ({
         ...t,
         participants: t.participants.map((p) => (p === oldName ? newName : p)),
-        paidParticipants: (t.paidParticipants || []).map((p) => (p === oldName ? newName : p)),
+        paidSettlements: (t.paidSettlements || []).map((key) =>
+          key.split('|').map((p) => (p === oldName ? newName : p)).join('|')
+        ),
         bills: t.bills.map((b) => ({
           ...b,
           paidBy: b.paidBy === oldName ? newName : b.paidBy,
@@ -58,15 +61,29 @@ export default function App() {
     setTabs([]);
   }
 
-  function markPaid(tabId, person) {
+  function markPaid(tabId, from, to) {
     setTabs((prev) =>
       prev.map((t) => {
         if (t.id !== tabId) return t;
-        const paidParticipants = [...new Set([...(t.paidParticipants || []), person])];
-        const allPaid = t.participants.every((p) => p === currentUser || paidParticipants.includes(p));
-        return { ...t, paidParticipants, settled: t.settled || allPaid };
+        const paidSettlements = [...new Set([...(t.paidSettlements || []), `${from}|${to}`])];
+        const updated = { ...t, paidSettlements };
+        const stillPending = settlementsForTab(updated).some((s) => s.status === 'pending');
+        return { ...updated, settled: t.settled || !stillPending };
       })
     );
+  }
+
+  function handleAddParticipant(tabId, name) {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setTabs((prev) =>
+      prev.map((t) => {
+        if (t.id !== tabId) return t;
+        if (t.participants.some((p) => p.toLowerCase() === trimmed.toLowerCase())) return t;
+        return { ...t, participants: [...t.participants, trimmed] };
+      })
+    );
+    setKnownPeople((prev) => [...new Set([...prev, trimmed])]);
   }
 
   function handleAddBillSubmit({ destTabId, newTabName, tabType, participants, newPeople, bill }) {
@@ -82,7 +99,7 @@ export default function App() {
                 total: t.total + bill.total,
                 participants: [...new Set([...t.participants, ...participants])],
                 settled: false,
-                paidParticipants: [],
+                paidSettlements: [],
                 updated: 'just now',
               }
             : t
@@ -96,7 +113,7 @@ export default function App() {
         bills: [bill],
         total: bill.total,
         settled: false,
-        paidParticipants: [],
+        paidSettlements: [],
         updated: 'just now',
       };
       return [newTab, ...prev];
@@ -133,7 +150,16 @@ export default function App() {
       case 'tabs':
         return <TabsScreen tabs={tabs} onNavigate={navigate} />;
       case 'tabDetail':
-        return <TabDetailScreen tab={activeTab} currentUser={currentUser} onNavigate={navigate} onMarkPaid={markPaid} />;
+        return (
+          <TabDetailScreen
+            tab={activeTab}
+            currentUser={currentUser}
+            knownPeople={knownPeople}
+            onNavigate={navigate}
+            onMarkPaid={markPaid}
+            onAddParticipant={handleAddParticipant}
+          />
+        );
       case 'addBill':
         return (
           <AddBillScreen
@@ -177,7 +203,7 @@ export default function App() {
           />
         );
       case 'history':
-        return <HistoryScreen tabs={tabs} currentUser={currentUser} onNavigate={navigate} />;
+        return <HistoryScreen tabs={tabs} onNavigate={navigate} />;
       case 'profile':
         return <ProfileScreen currentUser={currentUser} onRename={handleRename} onResetData={handleResetData} />;
       default:

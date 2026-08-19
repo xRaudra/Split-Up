@@ -1,10 +1,10 @@
 import HomeHero from '../components/HomeHero';
 import TabCard from '../components/TabCard';
 import EmptyState from '../components/EmptyState';
-import { totalOwedToUser } from '../data/appState';
+import { netBalanceForUser } from '../data/appState';
 
 export default function HomeScreen({ tabs, currentUser, onNavigate }) {
-  const owed = totalOwedToUser(tabs, currentUser);
+  const net = netBalanceForUser(tabs, currentUser);
   const activeTabs = tabs.filter((t) => !t.settled);
   const hasAnyTabs = tabs.length > 0;
 
@@ -12,13 +12,15 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
     <div className="flex flex-col h-full overflow-y-auto hide-scrollbar screen-enter" style={{ background: '#F8FAFC' }}>
       <HomeHero
         currentUser={currentUser}
-        amount={`₹${owed.toLocaleString('en-IN')}`}
+        amount={`₹${Math.abs(net).toLocaleString('en-IN')}`}
         badge={
           !hasAnyTabs
             ? 'Create your first tab to get started'
-            : owed > 0
+            : net > 0
               ? "You'll receive across all tabs"
-              : "You're all settled up"
+              : net < 0
+                ? "You owe across all tabs"
+                : "You're all settled up"
         }
       />
 

@@ -10,6 +10,7 @@ export default function AddBillMethodScreen({
   currentUser, billName, amount, participants, newPeople, destTabId, newTabName, tabType,
   presetTabId, onNavigate, onSubmit,
 }) {
+  const [paidBy, setPaidBy] = useState(currentUser);
   const [method, setMethod] = useState('equally');
   const [customShares, setCustomShares] = useState({});
 
@@ -45,7 +46,7 @@ export default function AddBillMethodScreen({
       id: `bill-${Date.now()}`,
       name: billName,
       total: amountNum,
-      paidBy: currentUser,
+      paidBy,
       method,
       shares,
     };
@@ -60,6 +61,31 @@ export default function AddBillMethodScreen({
         <div className="flex items-center justify-between px-4 py-3 rounded-[10px] bg-white" style={{ border: '1px solid #E5E7EB' }}>
           <span className="font-semibold text-sm text-[#111827] truncate">{billName}</span>
           <span className="font-semibold text-sm text-[#111827] shrink-0">₹{amountNum.toLocaleString('en-IN')}</span>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Who Paid?</span>
+          <div className="flex flex-wrap gap-2">
+            {participants.map((p) => {
+              const isSelected = paidBy === p;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPaidBy(p)}
+                  className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full"
+                  style={{
+                    background: isSelected ? '#EEF2FF' : '#FFFFFF',
+                    border: `1.5px solid ${isSelected ? '#4F46E5' : '#E5E7EB'}`,
+                  }}
+                >
+                  <Avatar name={p} size={24} />
+                  <span className="text-sm font-semibold" style={{ color: isSelected ? '#4F46E5' : '#111827' }}>
+                    {displayName(p, currentUser)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="flex flex-col gap-1.5">

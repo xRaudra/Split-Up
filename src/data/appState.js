@@ -2,10 +2,6 @@
 // user creates in a session. State lives in App.jsx (React state only), so
 // closing the tab clears it; nothing is written to storage or a server.
 
-function sumShares(bills, person) {
-  return bills.reduce((sum, b) => sum + (b.shares[person] || 0), 0);
-}
-
 export function billsTotal(bills) {
   return bills.reduce((sum, b) => sum + b.total, 0);
 }
@@ -16,23 +12,69 @@ export function displayName(name, currentUser) {
   return name === currentUser ? 'You' : name;
 }
 
-// Who owes `currentUser` what, per tab (currentUser assumed payer on all
-// bills for this MVP — no per-bill payer selection yet).
-export function settlementsForTab(tab, currentUser) {
-  return tab.participants
-    .filter((p) => p !== currentUser)
-    .map((p) => ({
-      from: p,
-      to: currentUser,
-      amount: sumShares(tab.bills, p),
-      status: tab.settled || tab.paidParticipants?.includes(p) ? 'paid' : 'pending',
-    }))
-    .filter((s) => s.amount > 0);
+function settlementKey(from, to) {
+  return `${from}|${to}`;
 }
 
-export function totalOwedToUser(tabs, currentUser) {
-  return tabs
-    .flatMap((t) => settlementsForTab(t, currentUser))
-    .filter((s) => s.status === 'pending')
-    .reduce((sum, s) => sum + s.amount, 0);
+// Each bill can have a different payer, so "who owes whom" isn't a single
+// direction anymore — it's a net balance per person (what they paid, minus
+// what their own shares came to across every bill in the tab), resolved
+// into the smallest set of payments via greedy debt simplification (match
+// the biggest debtor against the biggest creditor, repeat).
+export function settlementsForTab(tab) {
+  const balances = {};
+  for (const p of tab.participants) balances[p] = 0;
+  for (const bill of tab.bills) {
+    balances[bill.paidBy] = (balances[bill.paidBy] || 0) + bill.total;
+    for (const [person, share] of Object.entries(bill.shares)) {
+      balances[person] = (balances[person] || 0) - share;
+    }
+  }
+
+  const creditors = Object.entries(balances)
+    .filter(([, v]) => v > 0.5)
+    .map(([name, amount]) => ({ name, amount }))
+    .sort((a, b) => b.amount - a.amount);
+  const debtors = Object.entries(balances)
+    .filter(([, v]) => v < -0.5)
+    .map(([name, amount]) => ({ name, amount: -amount }))
+    .sort((a, b) => b.amount - a.amount);
+
+  const settlements = [];
+  let i = 0;
+  let j = 0;
+  while (i < debtors.length && j < creditors.length) {
+    const debtor = debtors[i];
+    const creditor = creditors[j];
+    const amount = Math.round(Math.min(debtor.amount, creditor.amount));
+    if (amount > 0) {
+      const key = settlementKey(debtor.name, creditor.name);
+      settlements.push({
+        from: debtor.name,
+        to: creditor.name,
+        amount,
+        status: tab.settled || (tab.paidSettlements || []).includes(key) ? 'paid' : 'pending',
+      });
+    }
+    debtor.amount -= amount;
+    creditor.amount -= amount;
+    if (debtor.amount < 1) i++;
+    if (creditor.amount < 1) j++;
+  }
+  return settlements;
+}
+
+// Net position across all active tabs: positive = you're owed overall,
+// negative = you owe overall. Can be either now that any participant can
+// be a bill's payer, not just the current user.
+export function netBalanceForUser(tabs, currentUser) {
+  let net = 0;
+  for (const tab of tabs) {
+    for (const s of settlementsForTab(tab)) {
+      if (s.status !== 'pending') continue;
+      if (s.to === currentUser) net += s.amount;
+      if (s.from === currentUser) net -= s.amount;
+    }
+  }
+  return net;
 }
