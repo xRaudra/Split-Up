@@ -145,7 +145,19 @@ export default function App() {
           />
         );
       case 'addBillTab':
-        return <AddToTabScreen tabs={tabs} onNavigate={navigate} restore={screenData?.restore} />;
+        return (
+          <AddToTabScreen
+            tabs={tabs}
+            billName={screenData?.billName}
+            amount={screenData?.amount}
+            participants={screenData?.participants}
+            newPeople={screenData?.newPeople}
+            paidBy={screenData?.paidBy}
+            restoreAddBill={screenData?.restoreAddBill}
+            restore={screenData?.restore}
+            onNavigate={navigate}
+          />
+        );
       case 'addBill':
         return (
           <AddBillScreen
@@ -153,9 +165,6 @@ export default function App() {
             currentUser={currentUser}
             knownPeople={knownPeople}
             presetTabId={screenData?.tabId}
-            destTabId={screenData?.destTabId}
-            newTabName={screenData?.newTabName}
-            tabType={screenData?.tabType}
             restore={screenData?.restore}
             onNavigate={navigate}
           />
@@ -172,8 +181,9 @@ export default function App() {
             newTabName={screenData?.newTabName}
             tabType={screenData?.tabType}
             paidBy={screenData?.paidBy}
-            presetTabId={screenData?.tabId}
+            presetTabId={screenData?.presetTabId}
             restoreState={screenData?.restoreState}
+            restoreAddBill={screenData?.restoreAddBill}
             onNavigate={navigate}
             onSubmit={handleAddBillSubmit}
           />

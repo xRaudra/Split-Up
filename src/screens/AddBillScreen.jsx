@@ -11,17 +11,9 @@ import { displayName } from '../data/appState';
 
 const COMMON_BILL_NAMES = ['Dinner', 'Groceries', 'Cab', 'Rent', 'Drinks'];
 
-export default function AddBillScreen({
-  tabs, currentUser, knownPeople, presetTabId,
-  destTabId: incomingDestTabId, newTabName: incomingNewTabName, tabType: incomingTabType,
-  restore = {}, onNavigate,
-}) {
-  const resolvedDestTabId = presetTabId || incomingDestTabId || '__new__';
-  const resolvedNewTabName = incomingNewTabName || '';
-  const resolvedTabType = incomingTabType ?? null;
-  const isNewTab = resolvedDestTabId === '__new__';
-  const tab = tabs.find((t) => t.id === resolvedDestTabId);
-  const selectedType = tabTypeFor(resolvedTabType);
+export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTabId, restore = {}, onNavigate }) {
+  const tab = presetTabId ? tabs.find((t) => t.id === presetTabId) : null;
+  const selectedType = tab ? tabTypeFor(tab.type) : null;
 
   const [scanning, setScanning] = useState(false);
   const [billName, setBillName] = useState(restore.billName ?? '');
@@ -29,8 +21,8 @@ export default function AddBillScreen({
   const [contactsUnavailable, setContactsUnavailable] = useState(false);
 
   const existingMembers = useMemo(
-    () => (isNewTab ? [currentUser] : [...new Set([currentUser, ...(tab ? tab.participants : [])])]),
-    [isNewTab, tab, currentUser]
+    () => (tab ? [...new Set([currentUser, ...tab.participants])] : [currentUser]),
+    [tab, currentUser]
   );
 
   const [selected, setSelected] = useState(() => new Set(restore.selected ?? existingMembers));
@@ -99,31 +91,40 @@ export default function AddBillScreen({
     if (presetTabId) {
       onNavigate('tabDetail', { tabId: presetTabId });
     } else {
-      onNavigate('addBillTab', { restore: { destTabId: resolvedDestTabId, newTabName: resolvedNewTabName, tabType: resolvedTabType } });
+      onNavigate('home');
     }
   }
 
   function handleContinue() {
-    onNavigate('addBillMethod', {
-      tabId: presetTabId,
+    const payload = {
       billName: billName.trim(),
       amount,
-      destTabId: isNewTab ? null : resolvedDestTabId,
-      newTabName: isNewTab ? resolvedNewTabName : null,
-      tabType: isNewTab ? resolvedTabType : null,
       participants: finalParticipants,
       newPeople: newlyAdded,
       // Payer doesn't have to be sharing the bill themselves (e.g. paid for
       // others only) - just has to be someone actually on this bill's list.
       paidBy: [...existingMembers, ...newlyAdded].includes(paidBy) ? paidBy : currentUser,
-      restore: {
-        billName: billName.trim(),
-        amount,
-        selected: [...selected],
-        newlyAdded,
-        paidBy,
-      },
-    });
+    };
+    const restoreSelf = {
+      billName: billName.trim(),
+      amount,
+      selected: [...selected],
+      newlyAdded,
+      paidBy,
+    };
+
+    if (presetTabId) {
+      onNavigate('addBillMethod', {
+        ...payload,
+        presetTabId,
+        destTabId: presetTabId,
+        newTabName: null,
+        tabType: null,
+        restoreState: restoreSelf,
+      });
+    } else {
+      onNavigate('addBillTab', { ...payload, restoreAddBill: restoreSelf });
+    }
   }
 
   if (scanning) {
@@ -145,12 +146,14 @@ export default function AddBillScreen({
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
       <TopBar title="Add Bill" onBack={handleBack} />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pt-4 pb-8 flex flex-col gap-5 screen-enter">
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-[10px]" style={{ background: '#EEF2FF' }}>
-          {selectedType && <selectedType.Icon size={15} color="#4F46E5" />}
-          <span className="text-sm" style={{ color: '#4F46E5' }}>
-            Adding to <span className="font-semibold">{isNewTab ? resolvedNewTabName : tab?.name}</span>
-          </span>
-        </div>
+        {tab && (
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-[10px]" style={{ background: '#EEF2FF' }}>
+            {selectedType && <selectedType.Icon size={15} color="#4F46E5" />}
+            <span className="text-sm" style={{ color: '#4F46E5' }}>
+              Adding to <span className="font-semibold">{tab.name}</span>
+            </span>
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           <Input label="Bill Name" placeholder="e.g. Dinner at Beach Shack" value={billName} onChange={(e) => setBillName(e.target.value)} />
@@ -174,21 +177,23 @@ export default function AddBillScreen({
           <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Split Between</span>
 
           <div className="flex gap-2">
-            <input
-              value={participantInput}
-              onChange={(e) => setParticipantInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addPerson(participantInput); } }}
-              placeholder="Add a person by name"
-              className="flex-1 h-11 px-4 rounded-[10px] text-sm font-medium text-[#111827] bg-white outline-none placeholder:text-[#9CA3AF] placeholder:font-normal border-[1.5px] border-[#E5E7EB] focus:border-[#4F46E5] transition-colors"
-            />
-            <button
-              onClick={pickFromContacts}
-              aria-label="Add from contacts"
-              className="flex items-center justify-center rounded-[10px] shrink-0"
-              style={{ width: 44, height: 44, background: '#EEF2FF' }}
-            >
-              <Contact size={19} color="#4F46E5" />
-            </button>
+            <div className="relative flex-1">
+              <input
+                value={participantInput}
+                onChange={(e) => setParticipantInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addPerson(participantInput); } }}
+                placeholder="Add a person by name"
+                className="w-full h-11 pl-4 pr-11 rounded-[10px] text-sm font-medium text-[#111827] bg-white outline-none placeholder:text-[#9CA3AF] placeholder:font-normal border-[1.5px] border-[#E5E7EB] focus:border-[#4F46E5] transition-colors"
+              />
+              <button
+                onClick={pickFromContacts}
+                aria-label="Add from contacts"
+                className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full"
+                style={{ width: 34, height: 34, background: '#EEF2FF' }}
+              >
+                <Contact size={16} color="#4F46E5" />
+              </button>
+            </div>
             <button
               onClick={() => addPerson(participantInput)}
               disabled={!participantInput.trim()}
@@ -294,7 +299,7 @@ export default function AddBillScreen({
         <div className="flex-1" />
 
         <Button variant="primary" className="w-full" disabled={!canContinue} onClick={handleContinue}>
-          Split It Fairly
+          {presetTabId ? 'Split It Fairly' : 'Continue'}
         </Button>
       </div>
     </div>

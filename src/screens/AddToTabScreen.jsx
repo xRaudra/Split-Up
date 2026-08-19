@@ -8,7 +8,10 @@ import { TAB_TYPES, tabTypeFor } from '../data/tabTypes';
 
 const COMMON_TAB_NAMES = ['Trip', 'Roommates', 'Party', 'Weekend Getaway', 'Office Group'];
 
-export default function AddToTabScreen({ tabs, onNavigate, restore = {} }) {
+export default function AddToTabScreen({
+  tabs, onNavigate, restore = {},
+  billName, amount, participants, newPeople, paidBy, restoreAddBill,
+}) {
   const activeTabs = tabs.filter((t) => !t.settled);
   const [destTabId, setDestTabId] = useState(restore.destTabId || (activeTabs[0]?.id ?? '__new__'));
   const [newTabName, setNewTabName] = useState(restore.newTabName ?? '');
@@ -25,17 +28,27 @@ export default function AddToTabScreen({ tabs, onNavigate, restore = {} }) {
     setSheetOpen(false);
   }
 
+  function handleBack() {
+    onNavigate('addBill', { restore: restoreAddBill });
+  }
+
   function handleContinue() {
-    onNavigate('addBill', {
-      destTabId: isNewTab ? '__new__' : destTabId,
-      newTabName: isNewTab ? newTabName.trim() : '',
+    onNavigate('addBillMethod', {
+      billName,
+      amount,
+      participants,
+      newPeople,
+      paidBy,
+      destTabId: isNewTab ? null : destTabId,
+      newTabName: isNewTab ? newTabName.trim() : null,
       tabType: isNewTab ? tabType : null,
+      restoreAddBill,
     });
   }
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
-      <TopBar title="Add to a Tab" onBack={() => onNavigate('home')} />
+      <TopBar title="Add to a Tab" onBack={handleBack} />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pt-4 pb-8 flex flex-col gap-5 screen-enter">
         <span className="text-sm text-[#6B7280]">Every bill lives inside a tab — pick one, or start a new one.</span>
 
