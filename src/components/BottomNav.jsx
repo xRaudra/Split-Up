@@ -11,13 +11,13 @@ const tabs = [
 export default function BottomNav({ active, onNavigate }) {
   return (
     <div
-      className="flex items-center justify-around px-2 pt-2 pb-3"
+      className="flex items-center justify-around px-2"
       style={{
         background: 'rgba(255, 255, 255, 0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderTop: '1px solid #E5E7EB',
-        minHeight: 64,
+        height: 49,
         flexShrink: 0,
       }}
     >
