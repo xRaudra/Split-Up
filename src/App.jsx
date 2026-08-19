@@ -9,6 +9,7 @@ import TabsScreen from './screens/TabsScreen';
 import TabDetailScreen from './screens/TabDetailScreen';
 import AddBillScreen from './screens/AddBillScreen';
 import AddBillSplitScreen from './screens/AddBillSplitScreen';
+import AddBillMethodScreen from './screens/AddBillMethodScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
 
@@ -68,7 +69,7 @@ export default function App() {
     );
   }
 
-  function handleAddBillSubmit({ destTabId, newTabName, participants, newPeople, bill }) {
+  function handleAddBillSubmit({ destTabId, newTabName, tabType, participants, newPeople, bill }) {
     setKnownPeople((prev) => [...new Set([...prev, ...newPeople])]);
     const targetTabId = destTabId || `tab-${Date.now()}`;
     setTabs((prev) => {
@@ -90,6 +91,7 @@ export default function App() {
       const newTab = {
         id: targetTabId,
         name: newTabName,
+        type: tabType,
         participants,
         bills: [bill],
         total: bill.total,
@@ -100,6 +102,22 @@ export default function App() {
       return [newTab, ...prev];
     });
     navigate('tabDetail', { tabId: targetTabId });
+  }
+
+  // Bridges the Split screen's partial selection (tab/participants) into the
+  // Method screen's data, carrying billName/amount/presetTabId forward from
+  // whatever's already in screenData rather than re-collecting them.
+  function handleSplitContinue({ destTabId, newTabName, tabType, participants, newPeople }) {
+    navigate('addBillMethod', {
+      tabId: screenData?.tabId,
+      billName: screenData?.billName,
+      amount: screenData?.amount,
+      destTabId,
+      newTabName,
+      tabType,
+      participants,
+      newPeople,
+    });
   }
 
   const activeTab = tabs.find((t) => t.id === screenData?.tabId);
@@ -133,6 +151,26 @@ export default function App() {
             knownPeople={knownPeople}
             billName={screenData?.billName}
             amount={screenData?.amount}
+            presetTabId={screenData?.tabId}
+            initialDestTabId={screenData?.initialDestTabId}
+            initialNewTabName={screenData?.initialNewTabName}
+            initialTabType={screenData?.initialTabType}
+            initialParticipants={screenData?.initialParticipants}
+            onNavigate={navigate}
+            onNext={handleSplitContinue}
+          />
+        );
+      case 'addBillMethod':
+        return (
+          <AddBillMethodScreen
+            currentUser={currentUser}
+            billName={screenData?.billName}
+            amount={screenData?.amount}
+            participants={screenData?.participants}
+            newPeople={screenData?.newPeople}
+            destTabId={screenData?.destTabId}
+            newTabName={screenData?.newTabName}
+            tabType={screenData?.tabType}
             presetTabId={screenData?.tabId}
             onNavigate={navigate}
             onSubmit={handleAddBillSubmit}

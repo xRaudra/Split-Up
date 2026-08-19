@@ -29,8 +29,7 @@ export default function OnboardingNameScreen({ onSubmit }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
-          className="h-14 px-5 rounded-[10px] text-[18px] font-medium text-center outline-none placeholder:text-[#9CA3AF] placeholder:font-normal"
-          style={{ background: '#FFFFFF', border: '1.5px solid #E5E7EB' }}
+          className="h-14 px-5 rounded-[10px] text-[18px] font-medium text-center bg-white outline-none placeholder:text-[#9CA3AF] placeholder:font-normal border-[1.5px] border-[#E5E7EB] focus:border-[#4F46E5] transition-colors"
         />
         <Button type="submit" variant="primary" disabled={!trimmed} className="w-full">
           Continue

@@ -5,6 +5,8 @@ import Input from '../components/Input';
 import AmountInput from '../components/AmountInput';
 import Button from '../components/Button';
 
+const COMMON_BILL_NAMES = ['Dinner', 'Lunch', 'Groceries', 'Cab', 'Drinks', 'Movie', 'Rent', 'Hotel', 'Shopping'];
+
 export default function AddBillScreen({ onNavigate, presetTabId, initialBillName = '', initialAmount = '' }) {
   const [scanning, setScanning] = useState(false);
   const [billName, setBillName] = useState(initialBillName);
@@ -36,7 +38,25 @@ export default function AddBillScreen({ onNavigate, presetTabId, initialBillName
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
       <TopBar title="Add Bill" onBack={() => onNavigate(presetTabId ? 'tabDetail' : 'home', { tabId: presetTabId })} />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pt-4 pb-8 flex flex-col gap-5 screen-enter">
-        <Input label="Bill Name" placeholder="e.g. Dinner at Beach Shack" value={billName} onChange={(e) => setBillName(e.target.value)} />
+        <div className="flex flex-col gap-2">
+          <Input label="Bill Name" placeholder="e.g. Dinner at Beach Shack" value={billName} onChange={(e) => setBillName(e.target.value)} />
+          <div className="flex flex-wrap gap-2">
+            {COMMON_BILL_NAMES.map((name) => (
+              <button
+                key={name}
+                onClick={() => setBillName(name)}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                style={{
+                  background: billName === name ? '#EEF2FF' : '#F4F5F7',
+                  color: billName === name ? '#4F46E5' : '#6B7280',
+                }}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <AmountInput label="Amount" value={amount} onChange={setAmount} onScanClick={() => setScanning(true)} />
 
         <div className="flex-1" />

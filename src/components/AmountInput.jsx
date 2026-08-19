@@ -5,8 +5,9 @@ export default function AmountInput({ label, error, helper, value, onChange, onS
     <div className={`flex flex-col gap-1.5 ${className}`}>
       {label && <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">{label}</span>}
       <div
-        className="flex items-center gap-1 h-16 px-5 rounded-[10px]"
-        style={{ background: '#FFFFFF', border: `2px solid ${error ? '#DC2626' : '#4F46E5'}` }}
+        className={`flex items-center gap-1 h-16 px-5 rounded-[10px] bg-white border-2 transition-colors ${
+          error ? 'border-[#DC2626]' : 'border-[#E5E7EB] focus-within:border-[#4F46E5]'
+        }`}
       >
         <span className="font-bold text-[22px] text-[#111827]">₹</span>
         <input
