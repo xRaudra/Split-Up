@@ -28,7 +28,7 @@ export default function WelcomeScreen({ onNavigate }) {
             onClick={() => onNavigate('home')}
             className="w-full max-w-[300px] h-[54px] rounded-[18px] font-medium text-[18px] text-white"
             style={{
-              background: 'linear-gradient(160deg, #4F46E5 0%, #3730A3 100%)',
+              background: '#4F46E5',
               boxShadow: '0 3px 3px rgba(0,0,0,0.10), 0 12px 6px rgba(0,0,0,0.09), 0 27px 8px rgba(0,0,0,0.02)',
               letterSpacing: '-0.02em',
             }}

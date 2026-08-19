@@ -6,7 +6,7 @@ export default function Logo({ size = 105 }) {
         width: size,
         height: size,
         borderRadius: size * (18 / 105),
-        background: 'linear-gradient(160deg, #4F46E5 0%, #3730A3 100%)',
+        background: '#4F46E5',
         boxShadow: '0 3px 3px rgba(0,0,0,0.10), 0 12px 6px rgba(0,0,0,0.09), 0 27px 8px rgba(0,0,0,0.02)',
       }}
     >
