@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import Input from '../components/Input';
 import Avatar from '../components/Avatar';
 import Button from '../components/Button';
-import { TAB_TYPES } from '../data/tabTypes';
+import BottomSheet from '../components/BottomSheet';
+import { TAB_TYPES, tabTypeFor } from '../data/tabTypes';
 
 const COMMON_TAB_NAMES = ['Trip', 'Roommates', 'Party', 'Weekend Getaway', 'Office Group', 'Dinner Club'];
 
@@ -18,6 +19,7 @@ export default function AddBillSplitScreen({
   const [destTabId, setDestTabId] = useState(startDestTabId);
   const [newTabName, setNewTabName] = useState(initialNewTabName);
   const [tabType, setTabType] = useState(initialTabType);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [otherParticipants, setOtherParticipants] = useState(
     () => initialParticipants ?? (startTab ? startTab.participants.filter((p) => p !== currentUser) : [])
   );
@@ -45,7 +47,9 @@ export default function AddBillSplitScreen({
   );
 
   const isNewTab = destTabId === '__new__';
-  const canContinue = otherParticipants.length > 0 && (isNewTab ? newTabName.trim() : true);
+  const newTabReady = newTabName.trim().length > 0;
+  const canContinue = otherParticipants.length > 0 && (isNewTab ? newTabReady : true);
+  const selectedType = tabTypeFor(tabType);
 
   function handleContinue() {
     onNext({
@@ -87,60 +91,18 @@ export default function AddBillSplitScreen({
               </button>
             ))}
             <button
-              onClick={() => setDestTabId('__new__')}
-              className="px-3.5 py-2 rounded-full text-sm font-semibold"
+              onClick={() => setSheetOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold"
               style={{
-                background: isNewTab ? '#4F46E5' : '#FFFFFF',
-                color: isNewTab ? '#FFFFFF' : '#111827',
+                background: isNewTab ? '#EEF2FF' : '#FFFFFF',
+                color: isNewTab ? '#4F46E5' : '#111827',
                 border: `1.5px solid ${isNewTab ? '#4F46E5' : '#E5E7EB'}`,
               }}
             >
-              + New Tab
+              {isNewTab && selectedType && <selectedType.Icon size={14} />}
+              {isNewTab && newTabReady ? newTabName : '+ New Tab'}
             </button>
           </div>
-
-          {isNewTab && (
-            <div className="flex flex-col gap-2 mt-2">
-              <Input placeholder="New tab name" value={newTabName} onChange={(e) => setNewTabName(e.target.value)} />
-              <div className="flex flex-wrap gap-2">
-                {COMMON_TAB_NAMES.map((name) => (
-                  <button
-                    key={name}
-                    onClick={() => setNewTabName(name)}
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold"
-                    style={{
-                      background: newTabName === name ? '#EEF2FF' : '#F4F5F7',
-                      color: newTabName === name ? '#4F46E5' : '#6B7280',
-                    }}
-                  >
-                    {name}
-                  </button>
-                ))}
-              </div>
-
-              <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mt-1">Tab Type</span>
-              <div className="flex flex-wrap gap-2">
-                {TAB_TYPES.map(({ key, label, Icon }) => {
-                  const isSelected = tabType === key;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => setTabType(isSelected ? null : key)}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold"
-                      style={{
-                        background: isSelected ? '#EEF2FF' : '#FFFFFF',
-                        color: isSelected ? '#4F46E5' : '#111827',
-                        border: `1.5px solid ${isSelected ? '#4F46E5' : '#E5E7EB'}`,
-                      }}
-                    >
-                      <Icon size={15} />
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -206,6 +168,60 @@ export default function AddBillSplitScreen({
           Split It Fairly
         </Button>
       </div>
+
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Name Your Tab">
+        <Input placeholder="e.g. Goa Trip" value={newTabName} onChange={(e) => setNewTabName(e.target.value)} />
+
+        <div className="flex flex-wrap gap-2">
+          {COMMON_TAB_NAMES.map((name) => (
+            <button
+              key={name}
+              onClick={() => setNewTabName(name)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{
+                background: newTabName === name ? '#EEF2FF' : '#F4F5F7',
+                color: newTabName === name ? '#4F46E5' : '#6B7280',
+              }}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Tab Type (optional)</span>
+          <div className="flex flex-wrap gap-2">
+            {TAB_TYPES.map(({ key, label, Icon }) => {
+              const isSelected = tabType === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setTabType(isSelected ? null : key)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold"
+                  style={{
+                    background: isSelected ? '#EEF2FF' : '#FFFFFF',
+                    color: isSelected ? '#4F46E5' : '#111827',
+                    border: `1.5px solid ${isSelected ? '#4F46E5' : '#E5E7EB'}`,
+                  }}
+                >
+                  <Icon size={15} />
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <Button
+          variant="primary"
+          className="w-full"
+          disabled={!newTabReady}
+          onClick={() => { setDestTabId('__new__'); setSheetOpen(false); }}
+        >
+          <Check size={16} />
+          Use This Tab
+        </Button>
+      </BottomSheet>
     </div>
   );
 }
