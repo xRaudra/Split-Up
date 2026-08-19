@@ -18,6 +18,9 @@ export default function BottomNav({ active, onNavigate }) {
         WebkitBackdropFilter: 'blur(20px)',
         borderTop: '1px solid #E5E7EB',
         height: 83,
+        paddingTop: 10,
+        paddingBottom: 24,
+        boxSizing: 'border-box',
       }}
     >
       {tabs.map(({ key, label, Icon, primary }) => {
@@ -26,8 +29,8 @@ export default function BottomNav({ active, onNavigate }) {
           <button
             key={key}
             onClick={() => onNavigate(key)}
-            className="flex flex-col items-center justify-center gap-1 px-2 rounded-xl transition-all active:scale-95"
-            style={{ minWidth: 52, height: 60 }}
+            className="flex flex-col items-center justify-center gap-1 px-2 py-1 rounded-xl transition-all active:scale-95"
+            style={{ minWidth: 52 }}
           >
             {primary ? (
               <div
