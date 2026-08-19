@@ -17,7 +17,7 @@ export default function Logo({ size = 105 }) {
       style={{
         width: size,
         height: size,
-        borderRadius: size * (18 / 105),
+        borderRadius: 18,
         boxShadow: '0 3px 3px rgba(0,0,0,0.10), 0 12px 6px rgba(0,0,0,0.09), 0 27px 8px rgba(0,0,0,0.02)',
       }}
     >
