@@ -1,4 +1,4 @@
-import SummaryCard from '../components/SummaryCard';
+import HomeHero from '../components/HomeHero';
 import TabCard from '../components/TabCard';
 import EmptyState from '../components/EmptyState';
 import { totalOwedToUser } from '../data/appState';
@@ -6,27 +6,23 @@ import { totalOwedToUser } from '../data/appState';
 export default function HomeScreen({ tabs, currentUser, onNavigate }) {
   const owed = totalOwedToUser(tabs, currentUser);
   const activeTabs = tabs.filter((t) => !t.settled);
-  const firstName = currentUser.split(' ')[0];
   const hasAnyTabs = tabs.length > 0;
+  const [whole, decimals] = owed.toLocaleString('en-IN', { minimumFractionDigits: 2 }).split('.');
 
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scrollbar screen-enter" style={{ background: '#F8FAFC' }}>
-      <div className="px-5 pt-6 pb-2">
-        <span className="text-sm text-[#6B7280]">Hey {firstName} 👋</span>
-      </div>
-
-      <div className="px-5 mt-5">
-        <SummaryCard
-          value={`₹${owed.toLocaleString('en-IN')}`}
-          badge={
-            !hasAnyTabs
-              ? 'Create your first tab to get started'
-              : owed > 0
-                ? "You'll receive across all tabs"
-                : "You're all settled up"
-          }
-        />
-      </div>
+      <HomeHero
+        currentUser={currentUser}
+        whole={whole}
+        decimals={decimals}
+        badge={
+          !hasAnyTabs
+            ? 'Create your first tab to get started'
+            : owed > 0
+              ? "You'll receive across all tabs"
+              : "You're all settled up"
+        }
+      />
 
       {activeTabs.length > 0 && (
         <div className="flex items-center justify-between px-5 mt-5 mb-2">
