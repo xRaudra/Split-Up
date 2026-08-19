@@ -14,7 +14,7 @@ export default function WelcomeScreen({ onNavigate }) {
         <Logo size={82} />
 
         <div className="flex flex-col items-center gap-3.5 mt-[45px] px-4">
-          <h1 className="text-[36px] font-medium leading-none" style={{ color: '#4F46E5', letterSpacing: '-0.05em' }}>
+          <h1 className="text-[36px] font-normal leading-none" style={{ color: '#4F46E5', letterSpacing: '-0.05em' }}>
             Split Up
           </h1>
           <p className="text-center text-[16px] leading-snug" style={{ color: '#8F8F8F', letterSpacing: '-0.02em' }}>
