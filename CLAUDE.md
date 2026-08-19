@@ -32,6 +32,19 @@ Flow: **Welcome → "What should we call you?" (sets `currentUser`) → Home**, 
 - **Screen margin: 20px** (`px-5`) left/right on every screen's outer content container — don't use `px-4`/`px-6`/`px-8` for a screen's edge padding.
 - **Section gutter: 20px** (`gap-5`/`mt-5`/`mb-5`) between distinct sections stacked vertically on a screen (e.g. header → summary card → list → CTA). This does NOT apply to tight component-internal spacing (chip gaps, badge padding, list-item spacing between cards of the same kind) — those stay at their smaller, intentional values (`gap-2`/`gap-3`).
 
+## Type Scale (Figma "Visual Direction" page, "Type Section" — canonical, don't invent new sizes)
+| Token | Size | Weight | Use |
+|---|---|---|---|
+| Display Amount | 32px | Bold (700) | The ₹ amount, always — strongest hierarchy on any screen |
+| H1 | 24px | Bold (700) | Screen titles |
+| H2 | 20px | SemiBold (600) | Section headers |
+| Body | 16px | Regular (400) | Default text |
+| Body Medium | 16px | Medium (500) | Emphasized body |
+| Caption | 14px | Regular (400) | Metadata |
+| Small | 12px | Medium (500) | Labels, tags |
+
+The spec that defines this scale states **"Inter only, one typeface for the whole product"** — this conflicts with this file's own "Fonts: Poppins (headings), Inter (body)" line above and with existing Poppins usage in the code (Welcome screen wordmark, Logo-adjacent text). That conflict hasn't been resolved with the user — don't unilaterally strip Poppins from the product screens without asking, but don't add new Poppins usage either until it's settled.
+
 ## Component Conventions
 Shared components live in `src/components/` (Button, Input, AmountInput, Avatar, Logo, ParticipantRow, SplitMethodSelector, TabCard, SettlementRow, SummaryCard, StatusBadge, EmptyState, ErrorMessage, BottomNav, TopBar, PhoneFrame). `ParticipantRow` is a documented Design System component not currently consumed by any screen (Add Bill uses a chip-input instead) — that's fine, don't delete it as "unused." Screens live in `src/screens/`.
 

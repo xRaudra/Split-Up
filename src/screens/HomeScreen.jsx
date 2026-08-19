@@ -7,14 +7,12 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
   const owed = totalOwedToUser(tabs, currentUser);
   const activeTabs = tabs.filter((t) => !t.settled);
   const hasAnyTabs = tabs.length > 0;
-  const [whole, decimals] = owed.toLocaleString('en-IN', { minimumFractionDigits: 2 }).split('.');
 
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scrollbar screen-enter" style={{ background: '#F8FAFC' }}>
       <HomeHero
         currentUser={currentUser}
-        whole={whole}
-        decimals={decimals}
+        amount={`₹${owed.toLocaleString('en-IN')}`}
         badge={
           !hasAnyTabs
             ? 'Create your first tab to get started'
