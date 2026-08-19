@@ -22,7 +22,7 @@ export default function TabsScreen({ tabs, onNavigate }) {
         {active.length > 0 && (
           <>
             <span className="block font-semibold text-[13px] text-[#6B7280] uppercase tracking-wide mt-2 mb-2">Active</span>
-            <div className="flex flex-col gap-3 mb-6">
+            <div className="flex flex-col gap-3 mb-5">
               {active.map((tab) => (
                 <TabCard key={tab.id} tab={tab} onClick={() => onNavigate('tabDetail', { tabId: tab.id })} />
               ))}

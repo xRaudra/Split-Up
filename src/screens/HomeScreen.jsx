@@ -19,7 +19,7 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
       </div>
 
       {hasAnyTabs && (
-        <div className="px-5 mt-3">
+        <div className="px-5 mt-5">
           <SummaryCard
             headline={owed > 0 ? `You're owed ₹${owed.toLocaleString('en-IN')}` : "You're all settled up"}
             sub={owed > 0 ? 'Across all active tabs' : 'Nothing pending right now'}
@@ -29,13 +29,13 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
       )}
 
       {activeTabs.length > 0 && (
-        <div className="flex items-center justify-between px-5 mt-6 mb-2">
+        <div className="flex items-center justify-between px-5 mt-5 mb-2">
           <span className="font-semibold text-[15px] text-[#111827]">Active Tabs</span>
           <button onClick={() => onNavigate('tabs')} className="text-xs font-semibold text-[#4F46E5]">See all</button>
         </div>
       )}
 
-      <div className={`flex flex-col gap-3 px-5 ${activeTabs.length > 0 ? '' : 'mt-6'}`}>
+      <div className={`flex flex-col gap-3 px-5 ${activeTabs.length > 0 ? '' : 'mt-5'}`}>
         {activeTabs.length === 0 ? (
           hasAnyTabs ? (
             <button onClick={() => onNavigate('history')} className="text-center text-sm py-2" style={{ color: '#6B7280' }}>
@@ -57,7 +57,7 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
       </div>
 
       {hasAnyTabs && (
-        <div className="px-5 mt-6 mb-8">
+        <div className="px-5 mt-5 mb-8">
           <button
             onClick={() => onNavigate('addBill')}
             className="w-full h-12 rounded-[10px] font-semibold text-[15px] text-white"

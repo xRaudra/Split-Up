@@ -27,7 +27,7 @@ export default function ProfileScreen({ currentUser, onRename, onResetData }) {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scrollbar screen-enter" style={{ background: '#F8FAFC' }}>
-      <div className="flex flex-col items-center gap-3 px-5 pt-8 pb-6">
+      <div className="flex flex-col items-center gap-3 px-5 pt-8 pb-5">
         <Avatar name={currentUser} size={72} />
 
         {editing ? (
@@ -72,7 +72,7 @@ export default function ProfileScreen({ currentUser, onRename, onResetData }) {
         </button>
       </div>
 
-      <span className="text-center text-xs text-[#9CA3AF] mt-8 mb-6 px-8 leading-snug">
+      <span className="text-center text-xs text-[#9CA3AF] mt-5 mb-6 px-5 leading-snug">
         Split Up runs entirely on this device. Closing the tab clears everything — nothing is stored or sent anywhere.
       </span>
     </div>

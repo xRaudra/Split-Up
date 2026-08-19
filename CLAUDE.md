@@ -29,6 +29,8 @@ Flow: **Welcome → "What should we call you?" (sets `currentUser`) → Home**, 
 - Success `#16A34A` (semantic only) / Error `#DC2626` (destructive only)
 - Fonts: Poppins (headings), Inter (body)
 - Radius: sm 8 / md 10 / lg 12 / full 9999
+- **Screen margin: 20px** (`px-5`) left/right on every screen's outer content container — don't use `px-4`/`px-6`/`px-8` for a screen's edge padding.
+- **Section gutter: 20px** (`gap-5`/`mt-5`/`mb-5`) between distinct sections stacked vertically on a screen (e.g. header → summary card → list → CTA). This does NOT apply to tight component-internal spacing (chip gaps, badge padding, list-item spacing between cards of the same kind) — those stay at their smaller, intentional values (`gap-2`/`gap-3`).
 
 ## Component Conventions
 Shared components live in `src/components/` (Button, Input, AmountInput, Avatar, Logo, ParticipantRow, SplitMethodSelector, TabCard, SettlementRow, SummaryCard, StatusBadge, EmptyState, ErrorMessage, BottomNav, TopBar, PhoneFrame). `ParticipantRow` is a documented Design System component not currently consumed by any screen (Add Bill uses a chip-input instead) — that's fine, don't delete it as "unused." Screens live in `src/screens/`.

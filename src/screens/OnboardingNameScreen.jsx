@@ -12,7 +12,7 @@ export default function OnboardingNameScreen({ onSubmit }) {
   }
 
   return (
-    <div className="flex flex-col h-full px-6 pt-[110px] pb-8 fade-in" style={{ background: '#F8FAFC' }}>
+    <div className="flex flex-col h-full px-5 pt-[110px] pb-8 fade-in" style={{ background: '#F8FAFC' }}>
       <div className="flex flex-col items-center">
         <Logo size={64} />
         <h1 className="text-[26px] font-medium text-center mt-8" style={{ color: '#111827', letterSpacing: '-0.02em' }}>

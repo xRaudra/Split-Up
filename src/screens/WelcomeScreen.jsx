@@ -9,11 +9,11 @@ const footerLinks = [
 
 export default function WelcomeScreen({ onNavigate }) {
   return (
-    <div className="flex flex-col h-full px-4 pt-[150px] pb-5 fade-in overflow-y-auto hide-scrollbar" style={{ background: '#F8FAFC' }}>
+    <div className="flex flex-col h-full px-5 pt-[150px] pb-5 fade-in overflow-y-auto hide-scrollbar" style={{ background: '#F8FAFC' }}>
       <div className="flex-1 flex flex-col items-center justify-center min-h-0">
         <Logo size={82} />
 
-        <div className="flex flex-col items-center gap-3.5 mt-[45px] px-4">
+        <div className="flex flex-col items-center gap-3.5 mt-[45px]">
           <h1 className="text-[36px] font-normal leading-none" style={{ color: '#4F46E5', letterSpacing: '-0.05em' }}>
             Split Up
           </h1>

@@ -8,7 +8,7 @@ export default function AddBillScreen({ onNavigate, presetTabId }) {
 
   if (scanning) {
     return (
-      <div className="flex flex-col h-full items-center justify-center gap-4 px-8 text-center screen-enter" style={{ background: '#111827' }}>
+      <div className="flex flex-col h-full items-center justify-center gap-4 px-5 text-center screen-enter" style={{ background: '#111827' }}>
         <div className="flex items-center justify-center rounded-full" style={{ width: 64, height: 64, background: 'rgba(255,255,255,0.08)' }}>
           <Camera size={28} color="#FFFFFF" />
         </div>

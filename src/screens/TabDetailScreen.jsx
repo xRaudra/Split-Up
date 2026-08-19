@@ -13,7 +13,7 @@ export default function TabDetailScreen({ tab, currentUser, onNavigate, onMarkPa
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
       <TopBar title={tab.name} onBack={() => onNavigate('tabs')} />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 screen-enter">
-        <div className="flex items-center justify-between mt-1 mb-4">
+        <div className="flex items-center justify-between mt-1 mb-5">
           <div className="flex -space-x-2">
             {tab.participants.map((p) => (
               <div key={p} style={{ boxShadow: '0 0 0 2px #F8FAFC', borderRadius: 999 }}>
@@ -24,7 +24,7 @@ export default function TabDetailScreen({ tab, currentUser, onNavigate, onMarkPa
           <StatusBadge type={tab.settled ? 'settled' : 'active'} />
         </div>
 
-        <div className="flex flex-col items-center justify-center gap-1 py-6 rounded-2xl mb-6" style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}>
+        <div className="flex flex-col items-center justify-center gap-1 py-6 rounded-2xl mb-5" style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}>
           <span className="text-xs text-[#6B7280] uppercase tracking-wide font-semibold">Tab total</span>
           <span className="font-bold text-[28px] text-[#111827]">₹{tab.total.toLocaleString('en-IN')}</span>
         </div>
@@ -34,7 +34,7 @@ export default function TabDetailScreen({ tab, currentUser, onNavigate, onMarkPa
             <span className="block font-semibold text-[13px] text-[#6B7280] uppercase tracking-wide mb-2">
               {tab.settled ? 'Settlement' : 'Who owes what'}
             </span>
-            <div className="flex flex-col gap-2 mb-6">
+            <div className="flex flex-col gap-2 mb-5">
               {settlements.map((s) => (
                 <SettlementRow
                   key={s.from}
@@ -66,7 +66,7 @@ export default function TabDetailScreen({ tab, currentUser, onNavigate, onMarkPa
         {!tab.settled && (
           <Button
             variant="secondary"
-            className="w-full mt-6"
+            className="w-full mt-5"
             onClick={() => onNavigate('addBill', { tabId: tab.id })}
           >
             + Add Bill to this Tab
