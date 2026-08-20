@@ -1,8 +1,23 @@
-import { Home, Wallet, PlusCircle, Clock, User } from 'lucide-react';
+import { Home, PlusCircle, Clock, User } from 'lucide-react';
+
+// Mirrors src/assets/splits-icon.svg - kept inline (rather than imported
+// directly) so it can take size/color/strokeWidth props like the lucide
+// icons it sits next to in the nav bar.
+function SplitsIcon({ size = 24, color = 'currentColor', strokeWidth = 2 }) {
+  // The source art's viewBox is 38x36, not lucide's usual 24x24, so the
+  // incoming strokeWidth (calibrated for a 24-unit box) needs scaling up
+  // to land at the same rendered pixel thickness as the icons beside it.
+  return (
+    <svg width={size} height={size} viewBox="0 0 38 36" fill="none" stroke={color} strokeWidth={strokeWidth * (38 / 24)} strokeLinejoin="round">
+      <path d="M9.18178 17.777L0.75 11.4527V0.75L16.3176 12.4257V23.1284L0.75 34.8041V24.1014L9.18178 17.777ZM16.3176 12.4257L9.18178 17.777" />
+      <path d="M28.4533 17.777L36.8851 11.4527V0.75L21.3176 12.4257V23.1284L36.8851 34.8041V24.1014L28.4533 17.777ZM21.3176 12.4257L28.4533 17.777" />
+    </svg>
+  );
+}
 
 const leftTabs = [
   { key: 'home', label: 'Home', Icon: Home },
-  { key: 'tabs', label: 'Tabs', Icon: Wallet },
+  { key: 'tabs', label: 'Splits', Icon: SplitsIcon },
 ];
 const rightTabs = [
   { key: 'history', label: 'History', Icon: Clock },

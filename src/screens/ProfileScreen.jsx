@@ -20,7 +20,7 @@ export default function ProfileScreen({ currentUser, onRename, onResetData }) {
   }
 
   function handleReset() {
-    if (window.confirm('Clear every tab and bill from this session? This can\'t be undone.')) {
+    if (window.confirm('Clear every split and bill from this session? This can\'t be undone.')) {
       onResetData();
     }
   }

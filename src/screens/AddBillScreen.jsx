@@ -260,7 +260,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
             className="text-center text-sm font-semibold disabled:opacity-40"
             style={{ color: '#6B7280' }}
           >
-            Continue without a Tab
+            Continue without a Split
           </button>
         )}
       </div>

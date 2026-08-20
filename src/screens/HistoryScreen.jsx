@@ -12,7 +12,7 @@ export default function HistoryScreen({ tabs, onNavigate }) {
       <TopBar title="History" />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pb-6 screen-enter">
         {settledTabs.length === 0 ? (
-          <EmptyState title="No settled tabs yet" body="Once a tab is fully paid up, it'll show up here." />
+          <EmptyState title="No settled splits yet" body="Once a split is fully paid up, it'll show up here." />
         ) : (
           <div className="flex flex-col gap-3">
             {settledTabs.map((tab) => {

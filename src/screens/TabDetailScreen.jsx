@@ -48,7 +48,7 @@ export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavig
               <div
                 className="flex items-center justify-center rounded-full"
                 style={{ width: 32, height: 32, background: '#EEF2FF', border: '2px solid #F8FAFC' }}
-                aria-label="Manage this tab"
+                aria-label="Manage this split"
               >
                 <Plus size={16} color="#4F46E5" />
               </div>
@@ -58,7 +58,7 @@ export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavig
         </div>
 
         <div className="flex flex-col items-center justify-center gap-1 py-6 rounded-2xl mb-5" style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}>
-          <span className="text-xs text-[#6B7280] uppercase tracking-wide font-semibold">Tab total</span>
+          <span className="text-xs text-[#6B7280] uppercase tracking-wide font-semibold">Split total</span>
           <span className="font-bold text-[28px] text-[#111827]">₹{tab.total.toLocaleString('en-IN')}</span>
         </div>
 
@@ -97,10 +97,10 @@ export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavig
         </div>
       </div>
 
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Manage Tab">
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Manage Split">
         {!tab.settled && (
           <Button variant="primary" className="w-full" onClick={handleAddBill}>
-            + Add Bill to this Tab
+            + Add Bill to this Split
           </Button>
         )}
 

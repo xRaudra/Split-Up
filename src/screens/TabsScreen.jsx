@@ -8,13 +8,13 @@ export default function TabsScreen({ tabs, onNavigate }) {
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
-      <TopBar title="Tabs" />
+      <TopBar title="Splits" />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pb-6 screen-enter">
         {tabs.length === 0 && (
           <EmptyState
-            title="No tabs yet"
-            body="Create your first tab to start splitting bills with friends."
-            ctaLabel="Create Tab"
+            title="No splits yet"
+            body="Create your first split to start adding bills with friends."
+            ctaLabel="Create Split"
             onCta={() => onNavigate('addBill')}
           />
         )}

@@ -48,9 +48,9 @@ export default function AddToTabScreen({
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
-      <TopBar title="Add to a Tab" onBack={handleBack} />
+      <TopBar title="Add to a Split" onBack={handleBack} />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pt-4 pb-8 flex flex-col gap-5 screen-enter">
-        <span className="text-sm text-[#6B7280]">Every bill lives inside a tab — pick one, or start a new one.</span>
+        <span className="text-sm text-[#6B7280]">Every bill lives inside a split — pick one, or start a new one.</span>
 
         <div className="flex flex-col gap-2">
           {activeTabs.map((t) => (
@@ -78,7 +78,7 @@ export default function AddToTabScreen({
           >
             <span className="flex items-center gap-1.5 font-semibold text-sm" style={{ color: isNewTab ? '#4F46E5' : '#111827' }}>
               {isNewTab && selectedType && <selectedType.Icon size={15} />}
-              {isNewTab && newTabReady ? newTabName : '+ New Tab'}
+              {isNewTab && newTabReady ? newTabName : '+ New Split'}
             </span>
             {isNewTab && <Check size={16} color="#4F46E5" />}
           </button>
@@ -91,7 +91,7 @@ export default function AddToTabScreen({
         </Button>
       </div>
 
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Name Your Tab">
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Name Your Split">
         <Input placeholder="e.g. Goa Trip" value={newTabName} onChange={(e) => setNewTabName(e.target.value)} />
 
         <div className="flex flex-wrap gap-2">
@@ -108,7 +108,7 @@ export default function AddToTabScreen({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Tab Type (optional)</span>
+          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Split Type (optional)</span>
           <div className="flex flex-wrap gap-2">
             {TAB_TYPES.map(({ key, label, Icon }) => {
               const isSelected = tabType === key;
@@ -133,7 +133,7 @@ export default function AddToTabScreen({
 
         <Button variant="primary" className="w-full" disabled={!newTabReady} onClick={confirmNewTab}>
           <Check size={16} />
-          Use This Tab
+          Use This Split
         </Button>
       </BottomSheet>
     </div>

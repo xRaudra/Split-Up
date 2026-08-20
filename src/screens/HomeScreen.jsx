@@ -20,7 +20,7 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
 
       {activeTabs.length > 0 && (
         <div className="flex items-center justify-between px-5 mt-5 mb-2">
-          <span className="font-semibold text-[15px] text-[#111827]">Active Tabs</span>
+          <span className="font-semibold text-[15px] text-[#111827]">Active Splits</span>
           <button onClick={() => onNavigate('tabs')} className="text-xs font-semibold text-[#4F46E5]">See all</button>
         </div>
       )}
@@ -29,14 +29,14 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
         {activeTabs.length === 0 ? (
           hasAnyTabs ? (
             <button onClick={() => onNavigate('history')} className="text-center text-sm py-2" style={{ color: '#6B7280' }}>
-              No active tabs right now — see settled ones in <span style={{ color: '#4F46E5', fontWeight: 600 }}>History</span>
+              No active splits right now — see settled ones in <span style={{ color: '#4F46E5', fontWeight: 600 }}>History</span>
             </button>
           ) : (
             <EmptyState
               title="Ready to split your first bill"
               body={
                 <>
-                  Tap <span style={{ color: '#4F46E5', fontWeight: 700 }}>+</span> below to create your first tab and start splitting with friends.
+                  Tap <span style={{ color: '#4F46E5', fontWeight: 700 }}>+</span> below to create your first split and start adding bills with friends.
                 </>
               }
             />
