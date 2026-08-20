@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Camera, Contact, X, Check, CircleDollarSign } from 'lucide-react';
+import { Camera, Contact, X, Check } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import Input from '../components/Input';
 import AmountInput from '../components/AmountInput';
@@ -244,7 +244,6 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
                     className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold shrink-0"
                     style={{ background: isPayer ? '#EEF2FF' : '#F4F5F7', color: isPayer ? '#4F46E5' : '#9CA3AF' }}
                   >
-                    <CircleDollarSign size={13} />
                     {isPayer ? 'Payer' : 'Payer?'}
                   </button>
                   <button
@@ -275,7 +274,6 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
                     className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold shrink-0"
                     style={{ background: isPayer ? '#FFFFFF' : 'transparent', color: isPayer ? '#4F46E5' : '#6B7280' }}
                   >
-                    <CircleDollarSign size={13} />
                     {isPayer ? 'Payer' : 'Payer?'}
                   </button>
                   <button
