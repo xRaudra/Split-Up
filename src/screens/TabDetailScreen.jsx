@@ -35,7 +35,7 @@ export default function TabDetailScreen({ tab, currentUser, knownPeople, onNavig
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
-      <TopBar title={tab.name} onBack={() => onNavigate('tabs')} />
+      <TopBar title={tab.name} onBack={() => onNavigate('tabs', { view: tab.standalone ? 'bills' : 'tabs' })} />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 screen-enter">
         <div className="flex items-center justify-between mt-1 mb-5">
           <button onClick={() => setSheetOpen(true)} className="flex items-center -space-x-2">

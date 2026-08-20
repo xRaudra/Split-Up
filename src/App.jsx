@@ -136,7 +136,7 @@ export default function App() {
       case 'home':
         return <HomeScreen tabs={tabs} currentUser={currentUser} onNavigate={navigate} />;
       case 'tabs':
-        return <TabsScreen tabs={tabs} currentUser={currentUser} onNavigate={navigate} />;
+        return <TabsScreen tabs={tabs} currentUser={currentUser} initialView={screenData?.view} onNavigate={navigate} />;
       case 'tabDetail':
         return (
           <TabDetailScreen

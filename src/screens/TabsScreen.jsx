@@ -8,8 +8,8 @@ const VIEWS = [
   { key: 'tabs', label: 'Tabs' },
 ];
 
-export default function TabsScreen({ tabs, currentUser, onNavigate }) {
-  const [view, setView] = useState('tabs');
+export default function TabsScreen({ tabs, currentUser, initialView, onNavigate }) {
+  const [view, setView] = useState(initialView || 'bills');
 
   // A bill added via "Continue without a Split" lives in an auto-created,
   // never-explicitly-chosen tab (standalone: true) and surfaces under
@@ -29,14 +29,14 @@ export default function TabsScreen({ tabs, currentUser, onNavigate }) {
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
       {tabs.length > 0 && (
         <div className="flex justify-center pt-4 pb-3 shrink-0">
-          <div className="flex gap-1 p-1.5 rounded-full" style={{ background: '#F4F5F7' }}>
+          <div className="flex gap-1 p-2 rounded-full" style={{ background: '#F4F5F7' }}>
             {VIEWS.map(({ key, label }) => {
               const isActive = view === key;
               return (
                 <button
                   key={key}
                   onClick={() => setView(key)}
-                  className="px-5 py-2 rounded-full text-xs font-semibold transition-colors"
+                  className="px-8 py-2 rounded-full text-xs font-semibold transition-colors"
                   style={{
                     background: isActive ? '#FFFFFF' : 'transparent',
                     color: isActive ? '#4F46E5' : '#6B7280',
