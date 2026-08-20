@@ -245,7 +245,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
                     style={{ background: isPayer ? '#EEF2FF' : '#F4F5F7', color: isPayer ? '#4F46E5' : '#9CA3AF' }}
                   >
                     <CircleDollarSign size={13} />
-                    {isPayer ? 'Paid' : 'Paid?'}
+                    {isPayer ? 'Payer' : 'Payer?'}
                   </button>
                   <button
                     onClick={() => toggleSelected(p)}
@@ -276,7 +276,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
                     style={{ background: isPayer ? '#FFFFFF' : 'transparent', color: isPayer ? '#4F46E5' : '#6B7280' }}
                   >
                     <CircleDollarSign size={13} />
-                    {isPayer ? 'Paid' : 'Paid?'}
+                    {isPayer ? 'Payer' : 'Payer?'}
                   </button>
                   <button
                     onClick={() => removeNewlyAdded(p)}
