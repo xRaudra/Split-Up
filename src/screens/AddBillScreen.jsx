@@ -173,6 +173,8 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
 
         <AmountInput label="Amount" value={amount} onChange={setAmount} onScanClick={() => setScanning(true)} />
 
+        <div style={{ borderTop: '1px solid #E5E7EB' }} />
+
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Split Between</span>
 
