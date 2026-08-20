@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Camera, Contact, X, Check } from 'lucide-react';
+import { Camera, Contact, X } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import Input from '../components/Input';
 import AmountInput from '../components/AmountInput';
 import Avatar from '../components/Avatar';
 import Button from '../components/Button';
 import ErrorMessage from '../components/ErrorMessage';
+import BottomSheet from '../components/BottomSheet';
 import { tabTypeFor } from '../data/tabTypes';
 import { displayName } from '../data/appState';
 
@@ -19,6 +20,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
   const [billName, setBillName] = useState(restore.billName ?? '');
   const [amount, setAmount] = useState(restore.amount ?? '');
   const [contactsUnavailable, setContactsUnavailable] = useState(false);
+  const [addSheetOpen, setAddSheetOpen] = useState(false);
 
   const existingMembers = useMemo(
     () => (tab ? [...new Set([currentUser, ...tab.participants])] : [currentUser]),
@@ -37,26 +39,31 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
     [existingMembers, selected, newlyAdded]
   );
 
-  function toggleSelected(name) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(name)) next.delete(name); else next.add(name);
-      return next;
-    });
-  }
-
   function addPerson(rawName) {
     const name = rawName.trim();
     if (!name) return;
-    const alreadyThere =
-      existingMembers.some((p) => p.toLowerCase() === name.toLowerCase()) ||
-      newlyAdded.some((p) => p.toLowerCase() === name.toLowerCase());
-    if (!alreadyThere) setNewlyAdded((prev) => [...prev, name]);
+    const existingMatch = existingMembers.find((p) => p.toLowerCase() === name.toLowerCase());
+    if (existingMatch) {
+      setSelected((prev) => new Set(prev).add(existingMatch));
+    } else if (!newlyAdded.some((p) => p.toLowerCase() === name.toLowerCase())) {
+      setNewlyAdded((prev) => [...prev, name]);
+    }
     setParticipantInput('');
   }
 
-  function removeNewlyAdded(name) {
-    setNewlyAdded((prev) => prev.filter((p) => p !== name));
+  // Existing tab members get excluded (still tab members, just not on this
+  // bill), brand-new people get forgotten entirely - either way they leave
+  // this bill's list, so the row shows a single X regardless of which.
+  function removeFromBill(name) {
+    if (newlyAdded.includes(name)) {
+      setNewlyAdded((prev) => prev.filter((p) => p !== name));
+    } else {
+      setSelected((prev) => {
+        const next = new Set(prev);
+        next.delete(name);
+        return next;
+      });
+    }
     if (paidBy === name) setPaidBy(currentUser);
   }
 
@@ -77,12 +84,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
   }
 
   const suggestions = knownPeople
-    .filter(
-      (p) =>
-        p !== currentUser &&
-        !existingMembers.some((m) => m.toLowerCase() === p.toLowerCase()) &&
-        !newlyAdded.some((m) => m.toLowerCase() === p.toLowerCase())
-    )
+    .filter((p) => !finalParticipants.some((m) => m.toLowerCase() === p.toLowerCase()))
     .slice(0, 5);
 
   const canContinue = billName.trim() && amountNum > 0 && finalParticipants.length > 0;
@@ -176,67 +178,24 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
         <div style={{ borderTop: '1px solid #E5E7EB' }} />
 
         <div className="flex flex-col gap-2">
-          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Split Between</span>
-
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <input
-                value={participantInput}
-                onChange={(e) => setParticipantInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addPerson(participantInput); } }}
-                placeholder="Add a person by name"
-                className="w-full h-11 pl-4 pr-11 rounded-[10px] text-sm font-medium text-[#111827] bg-white outline-none placeholder:text-[#9CA3AF] placeholder:font-normal border-[1.5px] border-[#E5E7EB] focus:border-[#4F46E5] transition-colors"
-              />
-              <button
-                onClick={pickFromContacts}
-                aria-label="Add from contacts"
-                className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center"
-                style={{ width: 34, height: 34 }}
-              >
-                <Contact size={16} color="#4F46E5" />
-              </button>
-            </div>
-            <button
-              onClick={() => addPerson(participantInput)}
-              disabled={!participantInput.trim()}
-              className="h-11 px-4 rounded-[10px] text-sm font-semibold disabled:opacity-40 shrink-0"
-              style={{ background: '#EEF2FF', color: '#4F46E5' }}
-            >
-              Add
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">
+              Split Between ({finalParticipants.length})
+            </span>
+            <button onClick={() => setAddSheetOpen(true)} className="text-xs font-semibold" style={{ color: '#4F46E5' }}>
+              + Add
             </button>
           </div>
 
-          {contactsUnavailable && (
-            <ErrorMessage
-              headline="Contacts aren't available here"
-              body="This browser doesn't support picking from your contacts. Add people by name above instead."
-            />
-          )}
-
-          {suggestions.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {suggestions.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => addPerson(p)}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold"
-                  style={{ background: '#F4F5F7', color: '#6B7280' }}
-                >
-                  + {p}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="flex flex-col gap-1.5 mt-1">
-            {existingMembers.map((p) => {
-              const isChecked = selected.has(p);
+          <div className="flex flex-col gap-1.5">
+            {finalParticipants.map((p) => {
               const isPayer = paidBy === p;
+              const isNew = newlyAdded.includes(p);
               return (
                 <div
                   key={p}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-[10px]"
-                  style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', opacity: isChecked ? 1 : 0.5 }}
+                  style={{ background: isNew ? '#EEF2FF' : '#FFFFFF', border: isNew ? '1.5px solid #4F46E5' : '1px solid #E5E7EB' }}
                 >
                   <Avatar name={p} size={32} />
                   <span className="flex-1 text-sm font-semibold text-[#111827] truncate">{displayName(p, currentUser)}</span>
@@ -244,45 +203,15 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
                     onClick={() => setPaidBy(p)}
                     aria-label={`Mark ${displayName(p, currentUser)} as payer`}
                     className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold shrink-0"
-                    style={{ background: isPayer ? '#EEF2FF' : '#F4F5F7', color: isPayer ? '#4F46E5' : '#9CA3AF' }}
+                    style={{ background: isPayer ? (isNew ? '#FFFFFF' : '#EEF2FF') : (isNew ? 'transparent' : '#F4F5F7'), color: isPayer ? '#4F46E5' : (isNew ? '#6B7280' : '#9CA3AF') }}
                   >
                     {isPayer ? 'Payer' : 'Payer?'}
                   </button>
                   <button
-                    onClick={() => toggleSelected(p)}
-                    aria-label={isChecked ? `Remove ${displayName(p, currentUser)} from this bill` : `Include ${displayName(p, currentUser)} in this bill`}
+                    onClick={() => removeFromBill(p)}
+                    aria-label={`Remove ${displayName(p, currentUser)} from this bill`}
                     className="flex items-center justify-center rounded-full shrink-0"
-                    style={{
-                      width: 22, height: 22,
-                      background: isChecked ? '#4F46E5' : '#FFFFFF',
-                      border: isChecked ? 'none' : '1.5px solid #E5E7EB',
-                    }}
-                  >
-                    {isChecked && <Check size={13} color="#FFFFFF" />}
-                  </button>
-                </div>
-              );
-            })}
-
-            {newlyAdded.map((p) => {
-              const isPayer = paidBy === p;
-              return (
-                <div key={p} className="flex items-center gap-3 px-3 py-2.5 rounded-[10px]" style={{ background: '#EEF2FF', border: '1.5px solid #4F46E5' }}>
-                  <Avatar name={p} size={32} />
-                  <span className="flex-1 text-sm font-semibold text-[#111827] truncate">{p}</span>
-                  <button
-                    onClick={() => setPaidBy(p)}
-                    aria-label={`Mark ${p} as payer`}
-                    className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold shrink-0"
-                    style={{ background: isPayer ? '#FFFFFF' : 'transparent', color: isPayer ? '#4F46E5' : '#6B7280' }}
-                  >
-                    {isPayer ? 'Payer' : 'Payer?'}
-                  </button>
-                  <button
-                    onClick={() => removeNewlyAdded(p)}
-                    aria-label={`Remove ${p}`}
-                    className="flex items-center justify-center rounded-full shrink-0"
-                    style={{ width: 22, height: 22, color: '#4F46E5' }}
+                    style={{ width: 22, height: 22, color: isNew ? '#4F46E5' : '#9CA3AF' }}
                   >
                     <X size={15} />
                   </button>
@@ -292,7 +221,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
           </div>
 
           {finalParticipants.length === 0 && (
-            <span className="text-xs" style={{ color: '#9CA3AF' }}>Select or add at least one person to split this with.</span>
+            <span className="text-xs" style={{ color: '#9CA3AF' }}>No one added yet — tap + Add to start splitting.</span>
           )}
         </div>
 
@@ -302,6 +231,58 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
           {presetTabId ? 'Split It Fairly' : 'Continue'}
         </Button>
       </div>
+
+      <BottomSheet open={addSheetOpen} onClose={() => setAddSheetOpen(false)} title="Add to Split">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <input
+              value={participantInput}
+              onChange={(e) => setParticipantInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addPerson(participantInput); } }}
+              placeholder="Add a person by name"
+              className="w-full h-11 pl-4 pr-11 rounded-[10px] text-sm font-medium text-[#111827] bg-white outline-none placeholder:text-[#9CA3AF] placeholder:font-normal border-[1.5px] border-[#E5E7EB] focus:border-[#4F46E5] transition-colors"
+            />
+            <button
+              onClick={pickFromContacts}
+              aria-label="Add from contacts"
+              className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center"
+              style={{ width: 34, height: 34 }}
+            >
+              <Contact size={16} color="#4F46E5" />
+            </button>
+          </div>
+          <button
+            onClick={() => addPerson(participantInput)}
+            disabled={!participantInput.trim()}
+            className="h-11 px-4 rounded-[10px] text-sm font-semibold disabled:opacity-40 shrink-0"
+            style={{ background: '#EEF2FF', color: '#4F46E5' }}
+          >
+            Add
+          </button>
+        </div>
+
+        {contactsUnavailable && (
+          <ErrorMessage
+            headline="Contacts aren't available here"
+            body="This browser doesn't support picking from your contacts. Add people by name above instead."
+          />
+        )}
+
+        {suggestions.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {suggestions.map((p) => (
+              <button
+                key={p}
+                onClick={() => addPerson(p)}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                style={{ background: '#F4F5F7', color: '#6B7280' }}
+              >
+                + {displayName(p, currentUser)}
+              </button>
+            ))}
+          </div>
+        )}
+      </BottomSheet>
     </div>
   );
 }
