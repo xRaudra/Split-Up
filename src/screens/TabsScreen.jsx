@@ -27,9 +27,33 @@ export default function TabsScreen({ tabs, currentUser, onNavigate }) {
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
+      {tabs.length > 0 && (
+        <div className="flex justify-center pt-4 pb-3 shrink-0">
+          <div className="flex gap-1 p-1.5 rounded-full" style={{ background: '#F4F5F7' }}>
+            {VIEWS.map(({ key, label }) => {
+              const isActive = view === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setView(key)}
+                  className="px-5 py-2 rounded-full text-xs font-semibold transition-colors"
+                  style={{
+                    background: isActive ? '#FFFFFF' : 'transparent',
+                    color: isActive ? '#4F46E5' : '#6B7280',
+                    boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div
         className={`flex-1 overflow-y-auto hide-scrollbar px-5 pb-6 screen-enter ${
-          tabs.length === 0 ? 'flex flex-col items-center justify-center' : 'pt-5'
+          tabs.length === 0 ? 'flex flex-col items-center justify-center' : ''
         }`}
       >
         {tabs.length === 0 ? (
@@ -41,26 +65,6 @@ export default function TabsScreen({ tabs, currentUser, onNavigate }) {
           />
         ) : (
           <>
-            <div className="flex gap-1 p-0.5 rounded-full mb-5" style={{ background: '#F4F5F7', width: 'fit-content' }}>
-              {VIEWS.map(({ key, label }) => {
-                const isActive = view === key;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setView(key)}
-                    className="px-4 py-1.5 rounded-full text-xs font-semibold transition-colors"
-                    style={{
-                      background: isActive ? '#FFFFFF' : 'transparent',
-                      color: isActive ? '#4F46E5' : '#6B7280',
-                      boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                    }}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-
             {view === 'bills' ? (
               standaloneBills.length === 0 ? (
                 <EmptyState
