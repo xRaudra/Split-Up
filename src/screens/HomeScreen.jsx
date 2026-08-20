@@ -1,10 +1,11 @@
 import HomeHero from '../components/HomeHero';
 import TabCard from '../components/TabCard';
 import EmptyState from '../components/EmptyState';
-import { netBalanceForUser } from '../data/appState';
+import { netBalanceForUser, balanceBreakdownForUser } from '../data/appState';
 
 export default function HomeScreen({ tabs, currentUser, onNavigate }) {
   const net = netBalanceForUser(tabs, currentUser);
+  const { receivable, owed } = balanceBreakdownForUser(tabs, currentUser);
   const activeTabs = tabs.filter((t) => !t.settled);
   const hasAnyTabs = tabs.length > 0;
 
@@ -13,15 +14,8 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
       <HomeHero
         currentUser={currentUser}
         amount={`₹${Math.abs(net).toLocaleString('en-IN')}`}
-        badge={
-          !hasAnyTabs
-            ? 'Create your first tab to get started'
-            : net > 0
-              ? "You'll receive across all tabs"
-              : net < 0
-                ? "You owe across all tabs"
-                : "You're all settled up"
-        }
+        receivable={receivable}
+        owed={owed}
       />
 
       {activeTabs.length > 0 && (

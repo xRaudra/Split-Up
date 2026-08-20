@@ -78,3 +78,19 @@ export function netBalanceForUser(tabs, currentUser) {
   }
   return net;
 }
+
+// Raw components behind the net figure — how much is coming in vs. going
+// out, before they cancel each other out. The net can hide that you still
+// owe someone specific even while you're "up" overall.
+export function balanceBreakdownForUser(tabs, currentUser) {
+  let receivable = 0;
+  let owed = 0;
+  for (const tab of tabs) {
+    for (const s of settlementsForTab(tab)) {
+      if (s.status !== 'pending') continue;
+      if (s.to === currentUser) receivable += s.amount;
+      if (s.from === currentUser) owed += s.amount;
+    }
+  }
+  return { receivable, owed };
+}
