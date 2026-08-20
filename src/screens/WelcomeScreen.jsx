@@ -4,7 +4,7 @@ import Logo from '../components/Logo';
 const footerLinks = [
   { label: 'Github Link', href: 'https://github.com/xRaudra/Split-Up.git' },
   { label: 'Figma Link', href: 'https://figmashort.link/WnDbwz' },
-  { label: 'Notes', href: '#' },
+  { label: 'Notes', href: 'https://drive.google.com/drive/folders/1ykOhgAr3LKC1Tulso1fwWhIC5dkv-N8O?usp=sharing' },
 ];
 
 export default function WelcomeScreen({ onNavigate }) {
