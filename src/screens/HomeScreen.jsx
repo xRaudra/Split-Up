@@ -13,7 +13,7 @@ export default function HomeScreen({ tabs, currentUser, onNavigate }) {
     <div className="flex flex-col h-full overflow-y-auto hide-scrollbar screen-enter" style={{ background: '#F8FAFC' }}>
       <HomeHero
         currentUser={currentUser}
-        amount={`₹${Math.abs(net).toLocaleString('en-IN')}`}
+        amount={`${net < 0 ? '-' : ''}₹${Math.abs(net).toLocaleString('en-IN')}`}
         receivable={receivable}
         owed={owed}
       />
