@@ -35,7 +35,7 @@ export default function WelcomeScreen({ onNavigate }) {
         >
           Get Started
         </button>
-        <span className="text-sm" style={{ color: '#A9A9A9', letterSpacing: '-0.02em' }}>Version 1.0.0</span>
+        <span className="text-sm" style={{ color: '#A9A9A9', letterSpacing: '-0.02em' }}>Version 3.0.0</span>
       </div>
 
       <div style={{ height: 64 }} />
