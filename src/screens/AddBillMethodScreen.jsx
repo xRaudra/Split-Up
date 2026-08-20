@@ -8,7 +8,7 @@ import { displayName } from '../data/appState';
 
 export default function AddBillMethodScreen({
   currentUser, billName, amount, participants, newPeople, destTabId, newTabName, tabType, paidBy,
-  presetTabId, restoreState, restoreAddBill, onNavigate, onSubmit,
+  presetTabId, restoreState, restoreAddBill, skipTabPicker, onNavigate, onSubmit,
 }) {
   const [method, setMethod] = useState('equally');
   const [customShares, setCustomShares] = useState({});
@@ -24,7 +24,7 @@ export default function AddBillMethodScreen({
   const canSubmit = method === 'equally' || remainder === 0;
 
   function handleBack() {
-    if (presetTabId) {
+    if (presetTabId || skipTabPicker) {
       onNavigate('addBill', { tabId: presetTabId, restore: restoreState });
     } else {
       onNavigate('addBillTab', {

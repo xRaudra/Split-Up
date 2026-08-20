@@ -184,6 +184,7 @@ export default function App() {
             presetTabId={screenData?.presetTabId}
             restoreState={screenData?.restoreState}
             restoreAddBill={screenData?.restoreAddBill}
+            skipTabPicker={screenData?.skipTabPicker}
             onNavigate={navigate}
             onSubmit={handleAddBillSubmit}
           />

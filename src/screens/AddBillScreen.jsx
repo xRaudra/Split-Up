@@ -45,16 +45,30 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
     const existingMatch = existingMembers.find((p) => p.toLowerCase() === name.toLowerCase());
     if (existingMatch) {
       setSelected((prev) => new Set(prev).add(existingMatch));
-    } else if (!newlyAdded.some((p) => p.toLowerCase() === name.toLowerCase())) {
-      setNewlyAdded((prev) => [...prev, name]);
+    } else {
+      // A name clashing with someone already added this session is most
+      // likely a different real person (e.g. two contacts named "Raj") -
+      // disambiguate instead of silently dropping who the user picked.
+      setNewlyAdded((prev) => {
+        const taken = new Set(prev.map((p) => p.toLowerCase()));
+        let unique = name;
+        let n = 2;
+        while (taken.has(unique.toLowerCase())) {
+          unique = `${name} (${n})`;
+          n += 1;
+        }
+        return [...prev, unique];
+      });
     }
     setParticipantInput('');
   }
 
   // Existing tab members get excluded (still tab members, just not on this
   // bill), brand-new people get forgotten entirely - either way they leave
-  // this bill's list, so the row shows a single X regardless of which.
+  // this bill's list, so the row shows a single X regardless of which. The
+  // current user is the one exception - they can't remove themselves.
   function removeFromBill(name) {
+    if (name === currentUser) return;
     if (newlyAdded.includes(name)) {
       setNewlyAdded((prev) => prev.filter((p) => p !== name));
     } else {
@@ -87,7 +101,8 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
     .filter((p) => !finalParticipants.some((m) => m.toLowerCase() === p.toLowerCase()))
     .slice(0, 5);
 
-  const canContinue = billName.trim() && amountNum > 0 && finalParticipants.length > 0;
+  // At least "You" plus one other person - a bill needs someone to split with.
+  const canContinue = billName.trim() && amountNum > 0 && finalParticipants.length >= 2;
 
   function handleBack() {
     if (presetTabId) {
@@ -97,8 +112,8 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
     }
   }
 
-  function handleContinue() {
-    const payload = {
+  function buildBillPayload() {
+    return {
       billName: billName.trim(),
       amount,
       participants: finalParticipants,
@@ -107,26 +122,39 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
       // others only) - just has to be someone actually on this bill's list.
       paidBy: [...existingMembers, ...newlyAdded].includes(paidBy) ? paidBy : currentUser,
     };
-    const restoreSelf = {
-      billName: billName.trim(),
-      amount,
-      selected: [...selected],
-      newlyAdded,
-      paidBy,
-    };
+  }
 
+  function buildRestoreSelf() {
+    return { billName: billName.trim(), amount, selected: [...selected], newlyAdded, paidBy };
+  }
+
+  function handleContinue() {
     if (presetTabId) {
       onNavigate('addBillMethod', {
-        ...payload,
+        ...buildBillPayload(),
         presetTabId,
         destTabId: presetTabId,
         newTabName: null,
         tabType: null,
-        restoreState: restoreSelf,
+        restoreState: buildRestoreSelf(),
       });
     } else {
-      onNavigate('addBillTab', { ...payload, restoreAddBill: restoreSelf });
+      onNavigate('addBillTab', { ...buildBillPayload(), restoreAddBill: buildRestoreSelf() });
     }
+  }
+
+  // Skips picking/naming a tab entirely - a quick, standalone bill still
+  // needs a container behind the scenes, so one gets created silently,
+  // named after the bill itself.
+  function handleContinueWithoutTab() {
+    onNavigate('addBillMethod', {
+      ...buildBillPayload(),
+      destTabId: null,
+      newTabName: billName.trim(),
+      tabType: null,
+      skipTabPicker: true,
+      restoreState: buildRestoreSelf(),
+    });
   }
 
   if (scanning) {
@@ -191,6 +219,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
             {finalParticipants.map((p) => {
               const isPayer = paidBy === p;
               const isNew = newlyAdded.includes(p);
+              const isSelf = p === currentUser;
               return (
                 <div
                   key={p}
@@ -207,21 +236,23 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
                   >
                     {isPayer ? 'Payer' : 'Payer?'}
                   </button>
-                  <button
-                    onClick={() => removeFromBill(p)}
-                    aria-label={`Remove ${displayName(p, currentUser)} from this bill`}
-                    className="flex items-center justify-center rounded-full shrink-0"
-                    style={{ width: 22, height: 22, color: isNew ? '#4F46E5' : '#9CA3AF' }}
-                  >
-                    <X size={15} />
-                  </button>
+                  {!isSelf && (
+                    <button
+                      onClick={() => removeFromBill(p)}
+                      aria-label={`Remove ${displayName(p, currentUser)} from this bill`}
+                      className="flex items-center justify-center rounded-full shrink-0"
+                      style={{ width: 22, height: 22, color: isNew ? '#4F46E5' : '#9CA3AF' }}
+                    >
+                      <X size={15} />
+                    </button>
+                  )}
                 </div>
               );
             })}
           </div>
 
-          {finalParticipants.length === 0 && (
-            <span className="text-xs" style={{ color: '#9CA3AF' }}>No one added yet — tap + Add to start splitting.</span>
+          {finalParticipants.length < 2 && (
+            <span className="text-xs" style={{ color: '#9CA3AF' }}>Add at least one more person to split this bill.</span>
           )}
         </div>
 
@@ -230,6 +261,17 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
         <Button variant="primary" className="w-full" disabled={!canContinue} onClick={handleContinue}>
           {presetTabId ? 'Split It Fairly' : 'Continue'}
         </Button>
+
+        {!presetTabId && (
+          <button
+            onClick={handleContinueWithoutTab}
+            disabled={!canContinue}
+            className="text-center text-sm font-semibold disabled:opacity-40"
+            style={{ color: '#6B7280' }}
+          >
+            Continue without a Tab
+          </button>
+        )}
       </div>
 
       <BottomSheet open={addSheetOpen} onClose={() => setAddSheetOpen(false)} title="Add to Split">
