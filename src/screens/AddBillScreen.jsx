@@ -146,7 +146,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
-      <TopBar title="Add Bill" onBack={handleBack} />
+      <TopBar title="Add Bill & Split" onBack={handleBack} />
       <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pt-4 pb-8 flex flex-col gap-5 screen-enter">
         {tab && (
           <div className="flex items-center gap-2 px-4 py-2.5 rounded-[10px]" style={{ background: '#EEF2FF' }}>
