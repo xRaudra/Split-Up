@@ -155,29 +155,25 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
           </div>
         )}
 
-        <div className="flex flex-col gap-4 p-4 rounded-xl bg-white" style={{ border: '1px solid #E5E7EB' }}>
-          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Bill Details</span>
-
-          <div className="flex flex-col gap-2">
-            <Input label="Bill Name" placeholder="e.g. Dinner at Beach Shack" value={billName} onChange={(e) => setBillName(e.target.value)} />
-            <div className="flex flex-wrap gap-2">
-              {COMMON_BILL_NAMES.map((name) => (
-                <button
-                  key={name}
-                  onClick={() => setBillName(name)}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold"
-                  style={{ background: billName === name ? '#EEF2FF' : '#F4F5F7', color: billName === name ? '#4F46E5' : '#6B7280' }}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
+        <div className="flex flex-col gap-2">
+          <Input label="Bill Name" placeholder="e.g. Dinner at Beach Shack" value={billName} onChange={(e) => setBillName(e.target.value)} />
+          <div className="flex flex-wrap gap-2">
+            {COMMON_BILL_NAMES.map((name) => (
+              <button
+                key={name}
+                onClick={() => setBillName(name)}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                style={{ background: billName === name ? '#EEF2FF' : '#F4F5F7', color: billName === name ? '#4F46E5' : '#6B7280' }}
+              >
+                {name}
+              </button>
+            ))}
           </div>
-
-          <AmountInput label="Amount" value={amount} onChange={setAmount} onScanClick={() => setScanning(true)} />
         </div>
 
-        <div className="flex flex-col gap-3 p-4 rounded-xl bg-white" style={{ border: '1px solid #E5E7EB' }}>
+        <AmountInput label="Amount" value={amount} onChange={setAmount} onScanClick={() => setScanning(true)} />
+
+        <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide">Split Between</span>
 
           <div className="flex gap-2">
