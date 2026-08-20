@@ -188,8 +188,8 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
               <button
                 onClick={pickFromContacts}
                 aria-label="Add from contacts"
-                className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full"
-                style={{ width: 34, height: 34, background: '#EEF2FF' }}
+                className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center"
+                style={{ width: 34, height: 34 }}
               >
                 <Contact size={16} color="#4F46E5" />
               </button>

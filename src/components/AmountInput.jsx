@@ -23,8 +23,8 @@ export default function AmountInput({ label, error, helper, value, onChange, onS
             type="button"
             onClick={onScanClick}
             aria-label="Scan bill with camera"
-            className="flex items-center justify-center rounded-full shrink-0"
-            style={{ width: 36, height: 36, background: '#EEF2FF' }}
+            className="flex items-center justify-center shrink-0"
+            style={{ width: 36, height: 36 }}
           >
             <Camera size={18} color="#4F46E5" />
           </button>
