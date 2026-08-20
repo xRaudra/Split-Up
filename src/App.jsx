@@ -86,7 +86,7 @@ export default function App() {
     setKnownPeople((prev) => [...new Set([...prev, trimmed])]);
   }
 
-  function handleAddBillSubmit({ destTabId, newTabName, tabType, participants, newPeople, bill }) {
+  function handleAddBillSubmit({ destTabId, newTabName, tabType, participants, newPeople, bill, standalone }) {
     setKnownPeople((prev) => [...new Set([...prev, ...newPeople])]);
     const targetTabId = destTabId || `tab-${Date.now()}`;
     setTabs((prev) => {
@@ -96,6 +96,9 @@ export default function App() {
           const uniqueBill = { ...bill, name: uniqueName(bill.name, t.bills.map((b) => b.name)) };
           return {
             ...t,
+            // Explicitly choosing a tab as this bill's destination "graduates"
+            // it out of the Bills category, even if it started standalone.
+            standalone: false,
             bills: [...t.bills, uniqueBill],
             total: t.total + uniqueBill.total,
             participants: [...new Set([...t.participants, ...participants])],
@@ -109,6 +112,7 @@ export default function App() {
         id: targetTabId,
         name: uniqueName(newTabName, prev.map((t) => t.name)),
         type: tabType,
+        standalone: !!standalone,
         participants,
         bills: [bill],
         total: bill.total,
@@ -185,6 +189,7 @@ export default function App() {
             restoreState={screenData?.restoreState}
             restoreAddBill={screenData?.restoreAddBill}
             skipTabPicker={screenData?.skipTabPicker}
+            standalone={screenData?.standalone}
             onNavigate={navigate}
             onSubmit={handleAddBillSubmit}
           />

@@ -144,6 +144,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
       newTabName: billName.trim(),
       tabType: null,
       skipTabPicker: true,
+      standalone: true,
       restoreState: buildRestoreSelf(),
     });
   }
