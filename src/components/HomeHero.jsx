@@ -21,7 +21,6 @@ export default function HomeHero({ currentUser, amount, receivable, owed }) {
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-5" style={{ gap: 6 }}>
-        <span className="text-white text-center" style={{ fontSize: 16, fontWeight: 600 }}>Main - RUP</span>
         <span className="text-white font-semibold text-center" style={{ fontSize: 51 }}>{amount}</span>
         <div className="flex items-center gap-2 mt-1">
           <div className="flex items-center gap-1.5 rounded-full" style={{ background: '#6B6EEA', padding: '8px 14px', borderRadius: 35 }}>
