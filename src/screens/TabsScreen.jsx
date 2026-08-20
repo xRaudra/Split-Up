@@ -27,7 +27,11 @@ export default function TabsScreen({ tabs, currentUser, onNavigate }) {
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#F8FAFC' }}>
-      <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pt-5 pb-6 screen-enter">
+      <div
+        className={`flex-1 overflow-y-auto hide-scrollbar px-5 pb-6 screen-enter ${
+          tabs.length === 0 ? 'flex flex-col items-center justify-center' : 'pt-5'
+        }`}
+      >
         {tabs.length === 0 ? (
           <EmptyState
             title="No splits yet"

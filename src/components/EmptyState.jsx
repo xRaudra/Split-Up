@@ -4,7 +4,7 @@ export default function EmptyState({ title, body, ctaLabel, onCta }) {
       <span className="font-semibold text-[17px] text-[#111827]">{title}</span>
       <span className="text-[13px] text-[#6B7280]">{body}</span>
       {ctaLabel && (
-        <button onClick={onCta} className="mt-1 h-10 px-5 rounded-[10px] font-semibold text-sm text-white" style={{ background: '#4F46E5' }}>
+        <button onClick={onCta} className="mt-1 font-semibold text-sm" style={{ color: '#4F46E5' }}>
           {ctaLabel}
         </button>
       )}
