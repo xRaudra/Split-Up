@@ -12,6 +12,21 @@ export function displayName(name, currentUser) {
   return name === currentUser ? 'You' : name;
 }
 
+// Names double as identifiers throughout the app (tabs, bills, people), so
+// a collision is confusing rather than harmless. Disambiguates with a
+// "(2)", "(3)"... suffix instead of silently merging or rejecting.
+export function uniqueName(candidate, existingNames) {
+  const taken = new Set(existingNames.map((n) => n.toLowerCase()));
+  if (!taken.has(candidate.toLowerCase())) return candidate;
+  let n = 2;
+  let unique = `${candidate} (${n})`;
+  while (taken.has(unique.toLowerCase())) {
+    n += 1;
+    unique = `${candidate} (${n})`;
+  }
+  return unique;
+}
+
 function settlementKey(from, to) {
   return `${from}|${to}`;
 }

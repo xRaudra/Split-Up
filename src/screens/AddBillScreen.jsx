@@ -8,7 +8,7 @@ import Button from '../components/Button';
 import ErrorMessage from '../components/ErrorMessage';
 import BottomSheet from '../components/BottomSheet';
 import { tabTypeFor } from '../data/tabTypes';
-import { displayName } from '../data/appState';
+import { displayName, uniqueName } from '../data/appState';
 
 const COMMON_BILL_NAMES = ['Dinner', 'Groceries', 'Cab', 'Rent', 'Drinks'];
 
@@ -49,16 +49,7 @@ export default function AddBillScreen({ tabs, currentUser, knownPeople, presetTa
       // A name clashing with someone already added this session is most
       // likely a different real person (e.g. two contacts named "Raj") -
       // disambiguate instead of silently dropping who the user picked.
-      setNewlyAdded((prev) => {
-        const taken = new Set(prev.map((p) => p.toLowerCase()));
-        let unique = name;
-        let n = 2;
-        while (taken.has(unique.toLowerCase())) {
-          unique = `${name} (${n})`;
-          n += 1;
-        }
-        return [...prev, unique];
-      });
+      setNewlyAdded((prev) => [...prev, uniqueName(name, prev)]);
     }
     setParticipantInput('');
   }

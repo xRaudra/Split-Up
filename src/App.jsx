@@ -12,7 +12,7 @@ import AddBillScreen from './screens/AddBillScreen';
 import AddBillMethodScreen from './screens/AddBillMethodScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
-import { settlementsForTab } from './data/appState';
+import { settlementsForTab, uniqueName } from './data/appState';
 
 const navScreens = ['home', 'tabs', 'history', 'profile'];
 
@@ -91,23 +91,23 @@ export default function App() {
     const targetTabId = destTabId || `tab-${Date.now()}`;
     setTabs((prev) => {
       if (destTabId) {
-        return prev.map((t) =>
-          t.id === destTabId
-            ? {
-                ...t,
-                bills: [...t.bills, bill],
-                total: t.total + bill.total,
-                participants: [...new Set([...t.participants, ...participants])],
-                settled: false,
-                paidSettlements: [],
-                updated: 'just now',
-              }
-            : t
-        );
+        return prev.map((t) => {
+          if (t.id !== destTabId) return t;
+          const uniqueBill = { ...bill, name: uniqueName(bill.name, t.bills.map((b) => b.name)) };
+          return {
+            ...t,
+            bills: [...t.bills, uniqueBill],
+            total: t.total + uniqueBill.total,
+            participants: [...new Set([...t.participants, ...participants])],
+            settled: false,
+            paidSettlements: [],
+            updated: 'just now',
+          };
+        });
       }
       const newTab = {
         id: targetTabId,
-        name: newTabName,
+        name: uniqueName(newTabName, prev.map((t) => t.name)),
         type: tabType,
         participants,
         bills: [bill],
